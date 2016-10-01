@@ -1,0 +1,4 @@
+ftsd
+fts.db
+*.o
+*.so

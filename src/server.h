@@ -1,0 +1,88 @@
+#ifndef __FTS_SERVER_H__
+#define __FTS_SERVER_H__
+
+#include <string>
+#include <chrono>
+#include <memory>
+#include <rtos/object_store.h>
+
+class Server {
+
+public:
+  // IMPORTANT
+  // All of the following transactions occur with respect to the set
+  // of lists stored on the Server as indicated by server_connection
+
+  /* Create a client connected to the server accepting connections
+   * smpl::Remote_Address server .
+   */
+  Server(std::shared_ptr<Object_Store> backend, const std::string &prefix);
+
+  /* Append data to the list indicated by key at some time (in milliseconds)
+  * between the time this function is called and the time it returns.
+  *
+  * key: Any std::string such that key.empty() = false
+  * data: Any string
+  */
+  bool append(const std::string &key, const std::string &data);
+
+  /* Append data to the list indicated by key at time
+  *
+  * key: Any std::string such that key.empty() = false
+  * time: Milliseconds since epoch > any previous time
+  * data: Any string
+  */
+  bool append(const std::string &key, const std::chrono::milliseconds &time,
+              const std::string &data);
+
+  /* Append entire archive to the list indicated by key
+  *
+  * key: Any std::string such that key.empty() = false
+  * archive: An Archive file, such that archive.head_time() >= the timestamp
+  * of the current last element of the timeseries associated with key.
+  */
+  //TODO:
+  //bool append_archive(const std::string &key, const Archive &archive);
+
+  /* Returns a vector of at most the N most recent entries in the list for key
+  * in chronological order.  If the list for key contains less than
+  * num_entries, the entire list is returned. If the list for key is empty,
+  * or num_entries is 0, a vector of size 0 is returned.
+  *
+  * key: Any std::string such that key.empty() = false
+  * num_entries: >= 0
+  */
+  //TODO:
+  //Archive lastn(const std::string &key, const unsigned long long &num_entries);
+
+  /* Returns a vector contains all the entries in the list for key in
+  * chronological order.  If the list is empty or no list exists, a vector
+  * of size 0 is returned.
+  *
+  * key: Any std::string such that key.empty() = false
+  */
+  //TODO:
+  //Archive all(const std::string &key);
+
+  /* Returns a vector of all the values in the list for key between time
+  * index start and end, inclusive. start and end must be in milliseconds since
+  * epoch.
+  *
+  * key: Any std::string such that key.empty() = false
+  * start: 0 <= end
+  * end: 0 >= start
+  */
+  //TODO:
+  /*Archive intervalt(const std::string &key, const std::chrono::milliseconds &start,
+            const std::chrono::milliseconds &end);
+  */
+
+private:
+  std::shared_ptr<Object_Store> _backend;
+  std::string _prefix;
+
+  std::string _calc_address(const std::string &key) const;
+
+};
+
+#endif
