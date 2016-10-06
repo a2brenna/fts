@@ -4,7 +4,11 @@
 #include <string>
 #include <chrono>
 #include <memory>
+#include <map>
+#include <mutex>
 #include <rtos/object_store.h>
+
+#include "metadata.h"
 
 class Server {
 
@@ -81,7 +85,12 @@ private:
   std::shared_ptr<Object_Store> _backend;
   std::string _prefix;
 
+  std::map<std::string, std::shared_ptr<Metadata>> _metadata;
+  mutable std::mutex _metadata_lock;
+
   std::string _calc_address(const std::string &key) const;
+  std::shared_ptr<Metadata> _get_metadata(const std::string &key) const;
+  std::shared_ptr<Metadata> _get_or_create_metadata(const std::string &key);
 
 };
 
