@@ -1,0 +1,11 @@
+Seperate Server/Client namespace:
+    Prefix all internal server object keys with $PREFIX:SERVER: and all client
+keys with $PREFIX:CLIENT.  Prevents clients from accidentally/deliberately
+messing with objects used for internal server bookkeeping.
+
+Metadata Caching:
+    Create way to cache and save metadata on gracefull shutdown and then load it
+back up. Store metadata in its own object and then append reference to
+$PREFIX:SERVER:metadata key On load, append some sort of invalidation notice
+to $PREFIX:SERVER:metadata so we know its not to be trusted until a fresh one
+is written
