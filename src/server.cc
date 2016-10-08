@@ -118,7 +118,8 @@ std::string Server::all(const std::string &key){
     //Does not require metadata/lock, atomic r/w property of backend ensures we only get complete archives
     const std::string backend_key = _prefix + key;
     try{
-        return _backend->fetch(backend_key).data();
+        const Data d = _backend->fetch(backend_key);
+        return d.data();
     }
     catch(E_OBJECT_DNE){
         throw E_TIMESERIES_DNE();

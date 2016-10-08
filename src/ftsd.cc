@@ -29,9 +29,9 @@ int main(int argc, char* argv[]){
 
     Server server(backend, PREFIX);
 
-    server.append("test_key2", "test_data2");
+    assert(server.append("test_key2", "test_dsad;lfjaowijfo;jata2"));
 
-    //std::cout << server.fetch("test_key2") << std::endl;
+    std::cout << server.all("test_key2") << std::endl;
 
     return 0;
 }
