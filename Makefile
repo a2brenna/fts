@@ -18,6 +18,7 @@ metadata.o: src/metadata.cc src/metadata.h
 	    ${CXX} ${CXXFLAGS} -c src/metadata.cc -o metadata.o
 
 clean:
+	rm -f ftsd
 	rm -f *.o
 	rm -f *.so
 	rm -f *.a
