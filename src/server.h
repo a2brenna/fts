@@ -11,6 +11,7 @@
 #include "metadata.h"
 
 class E_TIMESERIES_DNE {};
+class E_ORDER {};
 
 class Server {
 

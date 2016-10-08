@@ -79,7 +79,7 @@ bool Server::append(const std::string &key, const std::chrono::milliseconds &tim
 
     const std::chrono::high_resolution_clock::time_point t(time);
     if(t <= metadata->last_timestamp){
-        return false;
+        throw E_ORDER();
     }
 
     const std::string backend_key = _prefix + key;
@@ -92,17 +92,12 @@ bool Server::append(const std::string &key, const std::chrono::milliseconds &tim
     backend_string.append( (char *)&data_size, sizeof(uint64_t) );
     backend_string.append( data );
 
-    try{
-        _backend->append(backend_key, backend_string);
-        metadata->last_timestamp = t;
-        metadata->last_indexed++;
-        metadata->num_elements++;
-        return true;
-    }
-    catch(...){
-        return false;
-    }
+    _backend->append(backend_key, backend_string);
 
+    metadata->last_timestamp = t;
+    metadata->last_indexed++;
+    metadata->num_elements++;
+    return true;
 }
 
 /*
