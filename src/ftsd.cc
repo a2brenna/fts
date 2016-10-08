@@ -31,5 +31,7 @@ int main(int argc, char* argv[]){
 
     server.append("test_key2", "test_data2");
 
+    //std::cout << server.fetch("test_key2") << std::endl;
+
     return 0;
 }

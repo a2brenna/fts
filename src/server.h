@@ -10,6 +10,8 @@
 
 #include "metadata.h"
 
+class E_TIMESERIES_DNE {};
+
 class Server {
 
 public:
@@ -66,7 +68,7 @@ public:
   * key: Any std::string such that key.empty() = false
   */
   //TODO:
-  //Archive all(const std::string &key);
+  std::string all(const std::string &key);
 
   /* Returns a vector of all the values in the list for key between time
   * index start and end, inclusive. start and end must be in milliseconds since
@@ -89,7 +91,7 @@ private:
   mutable std::mutex _metadata_lock;
 
   std::string _calc_address(const std::string &key) const;
-  std::shared_ptr<Metadata> _get_metadata(const std::string &key) const;
+  std::shared_ptr<Metadata> _get_metadata(const std::string &key);
   std::shared_ptr<Metadata> _get_or_create_metadata(const std::string &key);
 
 };
