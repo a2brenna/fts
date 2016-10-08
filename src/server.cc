@@ -19,9 +19,7 @@ std::string record_extract_data(const char* record){
     return std::string(record + (sizeof(uint64_t) * 2), record_extract_size(record));
 }
 
-std::shared_ptr<Metadata> Server::_get_metadata(const std::string &key){
-    //TODO: move this lock so we don't hold it while constructing metadata
-    std::unique_lock<std::mutex> l(_metadata_lock);
+std::shared_ptr<Metadata> Server::_unsafe_get_metadata(const std::string &key){
     try{
         return _metadata.at(key);
     }
@@ -54,10 +52,15 @@ std::shared_ptr<Metadata> Server::_get_metadata(const std::string &key){
     }
 }
 
+std::shared_ptr<Metadata> Server::_get_metadata(const std::string &key){
+    std::unique_lock<std::mutex> l(_metadata_lock);
+    return _unsafe_get_metadata(key);
+}
+
 std::shared_ptr<Metadata> Server::_get_or_create_metadata(const std::string &key){
     std::unique_lock<std::mutex> l(_metadata_lock);
     try{
-        return _get_metadata(key);
+        return _unsafe_get_metadata(key);
     }
     catch(E_TIMESERIES_DNE timeseries_dne){
         return _metadata[key];
