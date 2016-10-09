@@ -63,7 +63,10 @@ std::shared_ptr<Metadata> Server::_get_or_create_metadata(const std::string &key
         return _unsafe_get_metadata(key);
     }
     catch(E_TIMESERIES_DNE timeseries_dne){
-        return _metadata[key];
+        //TODO: fix this to insert some metadata AND return pointer
+        std::shared_ptr<Metadata> m(new Metadata());
+        _metadata[key] = m;
+        return m;
     }
 }
 
