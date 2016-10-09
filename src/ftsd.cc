@@ -4,6 +4,7 @@
 #include <rtos/fs_store.h>
 #include <cassert>
 #include <memory>
+#include <thread>
 
 #include "server.h"
 
@@ -29,8 +30,14 @@ int main(int argc, char* argv[]){
 
     Server server(backend, PREFIX);
 
-    assert(server.append("test_key2", "test_dsad;lfjaowijfo;jata2"));
+    assert(server.append("test_key2", "test1"));
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    assert(server.append("test_key2", "test2"));
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    assert(server.append("test_key2", "test3"));
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
+    std::cout << server.lastn("test_key2", 2) << std::endl;
     std::cout << server.all("test_key2") << std::endl;
 
     return 0;

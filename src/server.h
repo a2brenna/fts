@@ -59,8 +59,7 @@ public:
   * key: Any std::string such that key.empty() = false
   * num_entries: >= 0
   */
-  //TODO:
-  //Archive lastn(const std::string &key, const unsigned long long &num_entries);
+  std::string lastn(const std::string &key, const unsigned long long &num_entries);
 
   /* Returns a vector contains all the entries in the list for key in
   * chronological order.  If the list is empty or no list exists, a vector
@@ -68,7 +67,6 @@ public:
   *
   * key: Any std::string such that key.empty() = false
   */
-  //TODO:
   std::string all(const std::string &key);
 
   /* Returns a vector of all the values in the list for key between time

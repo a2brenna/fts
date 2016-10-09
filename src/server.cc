@@ -1,6 +1,7 @@
 #include "server.h"
 #include <cassert>
 #include "metadata.h"
+#include "types.h"
 
 Server::Server(std::shared_ptr<Object_Store> backend, const std::string &prefix){
     _backend = backend;
@@ -109,13 +110,23 @@ bool Server::append_archive(const std::string &key, const Archive &archive){
     std::unique_lock<std::mutex> m(metadata->lock);
 
 }
+*/
 
-Archive Server::lastn(const std::string &key, const unsigned long long &num_entries){
+std::string Server::lastn(const std::string &key, const unsigned long long &num_entries){
     std::shared_ptr<Metadata> metadata = _get_metadata(key);
     std::unique_lock<std::mutex> m(metadata->lock);
 
+    const std::string backend_key = _prefix + key;
+    Archive a(_backend->fetch(backend_key).data());
+
+    const size_t lower_bound = std::max((ssize_t)0, (ssize_t)metadata->num_elements - (ssize_t)num_entries);
+
+    while(a.current_index() < lower_bound){
+        a.next_record();
+    }
+
+    return a.remainder();
 }
-*/
 
 std::string Server::all(const std::string &key){
     //Does not require metadata/lock, atomic r/w property of backend ensures we only get complete archives
