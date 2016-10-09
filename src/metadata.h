@@ -7,7 +7,7 @@
 class Metadata {
 
     public:
-        std::mutex lock;
+        mutable std::mutex lock;
         size_t num_elements = 0;
         size_t last_indexed = 0;
         std::chrono::high_resolution_clock::time_point last_timestamp;
