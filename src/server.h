@@ -78,9 +78,8 @@ public:
   * end: 0 >= start
   */
   //TODO:
-  /*Archive intervalt(const std::string &key, const std::chrono::milliseconds &start,
+  std::string intervalt(const std::string &key, const std::chrono::milliseconds &start,
             const std::chrono::milliseconds &end);
-  */
 
 private:
   std::shared_ptr<Object_Store> _backend;

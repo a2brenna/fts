@@ -161,11 +161,33 @@ std::string Server::all(const std::string &key){
     }
 }
 
-/*
-Archive Server::intervalt(const std::string &key, const std::chrono::milliseconds &start,
+std::string Server::intervalt(const std::string &key, const std::chrono::milliseconds &start,
             const std::chrono::milliseconds &end){
     std::shared_ptr<Metadata> metadata = _get_metadata(key);
     std::unique_lock<std::mutex> m(metadata->lock);
 
+    const std::string backend_key = _prefix + key;
+    Archive a(_backend->fetch(backend_key).data());
+
+    const std::chrono::high_resolution_clock::time_point s(start);
+    const std::chrono::high_resolution_clock::time_point e(end);
+
+    std::string output;
+
+    try{
+        while(a.current_time() < s){
+            a.next_record();
+        }
+
+        while(a.current_time() < e){
+            output.append(a.current_record());
+            a.next_record();
+        }
+    }
+    catch(E_END_OF_ARCHIVE e){
+
+    }
+
+    return output;
+
 }
-*/
