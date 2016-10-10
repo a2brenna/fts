@@ -86,6 +86,8 @@ private:
   std::shared_ptr<Object_Store> _backend;
   std::string _prefix;
 
+  size_t _index_resolution = 10;
+
   std::map<std::string, std::shared_ptr<Metadata>> _metadata;
   mutable std::mutex _metadata_lock;
 

@@ -44,6 +44,7 @@ std::shared_ptr<Metadata> Server::_unsafe_get_metadata(const std::string &key){
             std::shared_ptr<Metadata> m(new Metadata());
             m->num_elements = num_elements;
             m->last_timestamp = std::chrono::high_resolution_clock::time_point(std::chrono::milliseconds(latest_timestamp));
+            m->size = data.data().size();
             _metadata.insert(std::pair<std::string, std::shared_ptr<Metadata>>(key, m));
             return m;
         }
@@ -86,6 +87,17 @@ bool Server::append(const std::string &key, const std::chrono::milliseconds &tim
         throw E_ORDER();
     }
 
+    bool write_index = false;
+    if( (metadata->num_elements + 1) % _index_resolution == 0){
+        write_index = true;
+    }
+
+    Index_Record i;
+    i.offset = metadata->size;
+    i.index = metadata->num_elements;
+    i.timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(metadata->last_timestamp.time_since_epoch()).count();
+
+
     const std::string backend_key = _prefix + key;
 
     const uint64_t data_size = data.size();
@@ -99,8 +111,17 @@ bool Server::append(const std::string &key, const std::chrono::milliseconds &tim
     _backend->append(backend_key, backend_string);
 
     metadata->last_timestamp = t;
-    metadata->last_indexed++;
+    metadata->size += backend_string.size();
     metadata->num_elements++;
+
+    if(write_index){
+        static_assert(sizeof(Index_Record) == 24, "Index_Record is not 24 bytes");
+        std::string index_string;
+        index_string.append( (char *)&i, sizeof(Index_Record));
+
+        const std::string index_key = backend_key + ".index";
+        _backend->append(index_key, index_string);
+    }
     return true;
 }
 
