@@ -4,6 +4,8 @@
 #include <chrono>
 #include <string>
 
+class E_CORRUPT_INDEX {};
+
 struct Index_Record{
     uint64_t offset = 0;
     uint64_t index = 0;
@@ -19,7 +21,8 @@ class Index{
 
     private:
         std::string _buffer;
-        size_t _cursor;
+
+        void _consistency_check() const;
 
 };
 
