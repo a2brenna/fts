@@ -1,3 +1,11 @@
+Index:
+    Index each timeseries every k elements by appending a record of <timestamp,
+element_number, offset> and have Index objects return bounds <n, n + j> when
+queried to give the minimal chunk of the Archive to be retrieved/searched for
+the data in question.  Index records are fixed width (24 bytes) so we can binary
+search an Index quickly (since we can't binary search variable width
+Time_Series).
+
 Seperate Server/Client namespace:
     Prefix all internal server object keys with $PREFIX:SERVER: and all client
 keys with $PREFIX:CLIENT.  Prevents clients from accidentally/deliberately
@@ -5,7 +13,24 @@ messing with objects used for internal server bookkeeping.
 
 Metadata Caching:
     Create way to cache and save metadata on gracefull shutdown and then load it
-back up. Store metadata in its own object and then append reference to
+back up. Store metadata in its own object and then append reference to a Log
 $PREFIX:SERVER:metadata key On load, append some sort of invalidation notice
-to $PREFIX:SERVER:metadata so we know its not to be trusted until a fresh one
-is written
+(NULL REFERENCE?) to $PREFIX:SERVER:metadata so we know its not to be trusted
+until a fresh one is written
+
+Manifest:
+    Instead of hashing keys to their data/index objects, map them to random Ids
+so they can be changed in future.  This will allow reindexing and arbitrarily
+re-writing any particular timeseries. Load manifest file at runtime, append to
+it as necessary.
+
+Manifest Object Log:
+    Write out the manifest every time it changes, append <timepoint, Id> to a
+single Log object, so we can retrieve the manifest from any point in
+time/rewrite it entirely.
+
+Time_Series_Header:
+    Have a header of some sort that records the Time_Series type (Fixed Width,
+Variable Width, Fixed Interval, Variable Interval) and anything else that might
+be handy.  Store this header in the Manifest Object? At the beginning of each
+Time_Series Object?
