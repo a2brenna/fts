@@ -7,12 +7,6 @@
 class E_BAD_ARCHIVE {};
 class E_END_OF_ARCHIVE {};
 
-struct Index_Record{
-    uint64_t offset = 0;
-    uint64_t index = 0;
-    uint64_t timestamp = 0;
-};
-
 class Archive {
 
     public:

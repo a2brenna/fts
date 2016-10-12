@@ -8,8 +8,8 @@ CXXFLAGS=-L${LIBRARY_DIR} -I${INCLUDE_DIR} -O2 -g -std=c++14 -fPIC -Wall -Wextra
 
 all: ftsd
 
-ftsd: src/ftsd.cc server.o metadata.o types.o
-	${CXX} ${CXXFLAGS} -o ftsd src/ftsd.cc server.o metadata.o types.o -lboost_program_options -lrtosfs -lsodium
+ftsd: src/ftsd.cc server.o metadata.o archive.o
+	${CXX} ${CXXFLAGS} -o ftsd src/ftsd.cc server.o metadata.o archive.o -lboost_program_options -lrtosfs -lsodium
 
 server.o: src/server.cc src/server.h
 	    ${CXX} ${CXXFLAGS} -c src/server.cc -o server.o
@@ -17,8 +17,8 @@ server.o: src/server.cc src/server.h
 metadata.o: src/metadata.cc src/metadata.h
 	    ${CXX} ${CXXFLAGS} -c src/metadata.cc -o metadata.o
 
-types.o: src/types.cc src/types.h
-	    ${CXX} ${CXXFLAGS} -c src/types.cc -o types.o
+archive.o: src/archive.cc src/archive.h
+	    ${CXX} ${CXXFLAGS} -c src/archive.cc -o archive.o
 
 clean:
 	rm -f ftsd

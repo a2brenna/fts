@@ -1,7 +1,8 @@
 #include "server.h"
 #include <cassert>
 #include "metadata.h"
-#include "types.h"
+#include "archive.h"
+#include "index.h"
 
 Server::Server(std::shared_ptr<Object_Store> backend, const std::string &prefix){
     _backend = backend;
@@ -138,6 +139,10 @@ std::string Server::lastn(const std::string &key, const unsigned long long &num_
     std::unique_lock<std::mutex> m(metadata->lock);
 
     const std::string backend_key = _prefix + key;
+
+    const std::string index_key = backend_key + ".index";
+    const std::string index_string = _backend->fetch(index_key).data();
+
     Archive a(_backend->fetch(backend_key).data());
 
     const size_t lower_bound = std::max((ssize_t)0, (ssize_t)metadata->num_elements - (ssize_t)num_entries);
@@ -167,6 +172,10 @@ std::string Server::intervalt(const std::string &key, const std::chrono::millise
     std::unique_lock<std::mutex> m(metadata->lock);
 
     const std::string backend_key = _prefix + key;
+
+    const std::string index_key = backend_key + ".index";
+    const std::string index_string = _backend->fetch(index_key).data();
+
     Archive a(_backend->fetch(backend_key).data());
 
     const std::chrono::high_resolution_clock::time_point s(start);
