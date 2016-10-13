@@ -89,7 +89,7 @@ bool Server::append(const std::string &key, const std::chrono::milliseconds &tim
     }
 
     bool write_index = false;
-    if( (metadata->num_elements + 1) % _index_resolution == 0){
+    if( (metadata->num_elements) % _index_resolution == 0){
         write_index = true;
     }
 
