@@ -3,6 +3,7 @@
 
 #include <chrono>
 #include <string>
+#include <vector>
 
 class E_CORRUPT_INDEX {};
 
@@ -20,7 +21,7 @@ class Index{
         std::pair<size_t, size_t> lookup(const size_t &s, const size_t &e);
 
     private:
-        std::string _buffer;
+        std::vector<Index_Record> _index;
 
         void _consistency_check() const;
 

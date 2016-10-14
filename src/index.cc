@@ -1,29 +1,32 @@
 #include "index.h"
 #include <cassert>
+#include <cstring>
 
 Index::Index(const std::string &serialized_index){
-    _buffer = serialized_index;
+    const size_t index_bytes = serialized_index.size();
+
+    if(index_bytes % sizeof(Index_Record) != 0){
+        throw E_CORRUPT_INDEX();
+    }
+
+    _index.reserve(index_bytes / sizeof(Index_Record));
+    std::memcpy(_index.data(), &serialized_index[0], index_bytes);
+
     _consistency_check();
 }
 
 void Index::_consistency_check() const{
-    if(_buffer.size() % 24 != 0){
-        throw E_CORRUPT_INDEX();
-    }
-
-    if(_buffer.size() > 0){
-        Index_Record *current = (Index_Record *)(&_buffer[0]);
-        for(size_t c = 24; c < (_buffer.size() / 24); c += 24){
-            if (
-                    (((Index_Record *)(&_buffer[c]))->offset < current->offset) ||
-                    (((Index_Record *)(&_buffer[c]))->index < current->index) ||
-                    (((Index_Record *)(&_buffer[c]))->timestamp < current->timestamp)
-            ){
-                throw E_CORRUPT_INDEX();
-            }
-            else{
-                current = (Index_Record *)(&_buffer[c]);
-            }
+    const Index_Record* current = &_index[0];
+    for(size_t c = 1; c < _index.size(); c++){
+        if (
+                (_index[c].offset < current->offset) ||
+                (_index[c].index < current->index) ||
+                (_index[c].timestamp < current->timestamp)
+        ){
+            throw E_CORRUPT_INDEX();
+        }
+        else{
+            current = &_index[c];
         }
     }
 }
@@ -33,21 +36,21 @@ std::pair<size_t, size_t> Index::lookup(const size_t &s, const size_t &e){
 
     //TODO: Replace with binary search
     size_t c = 0;
-    for( ; c < _buffer.size(); c += 24){
-        if ( ((Index_Record *)(&_buffer[c]))->index > s ){
+    for( ; c < _index.size(); c += 24){
+        if ( _index[c].index > s ){
             break;
         }
         else{
-            r.first = ((Index_Record *)(&_buffer[c]))->offset;
+            r.first = _index[c].offset;
         }
     }
 
-    for( ; c < _buffer.size(); c += 24){
-        if ( ((Index_Record *)(&_buffer[c]))->index > e ){
+    for( ; c < _index.size(); c += 24){
+        if ( _index[c].index > e ){
             break;
         }
         else{
-            r.second = ((Index_Record *)(&_buffer[c]))->offset;
+            r.second = _index[c].offset;
         }
     }
 
@@ -62,21 +65,21 @@ std::pair<size_t, size_t> Index::lookup(const std::chrono::high_resolution_clock
 
     //TODO: Replace with binary search
     size_t c = 0;
-    for( ; c < _buffer.size(); c += 24){
-        if ( ((Index_Record *)(&_buffer[c]))->timestamp > s ){
+    for( ; c < _index.size(); c += 24){
+        if ( _index[c].timestamp > s ){
             break;
         }
         else{
-            r.first = ((Index_Record *)(&_buffer[c]))->offset;
+            r.first = _index[c].offset;
         }
     }
 
-    for( ; c < _buffer.size(); c += 24){
-        if ( ((Index_Record *)(&_buffer[c]))->timestamp > e ){
+    for( ; c < _index.size(); c += 24){
+        if ( _index[c].timestamp > e ){
             break;
         }
         else{
-            r.second = ((Index_Record *)(&_buffer[c]))->offset;
+            r.second = _index[c].offset;
         }
     }
 
