@@ -1,4 +1,4 @@
-Index:
+Index: Implemented, needs testing and simpler re-implementation
     Index each timeseries every k elements by appending a record of <timestamp,
 element_number, offset> and have Index objects return bounds <n, n + j> when
 queried to give the minimal chunk of the Archive to be retrieved/searched for
@@ -6,31 +6,48 @@ the data in question.  Index records are fixed width (24 bytes) so we can binary
 search an Index quickly (since we can't binary search variable width
 Time_Series).
 
-Seperate Server/Client namespace:
+Seperate Server/Client namespace: Pending
     Prefix all internal server object keys with $PREFIX:SERVER: and all client
 keys with $PREFIX:CLIENT.  Prevents clients from accidentally/deliberately
 messing with objects used for internal server bookkeeping.
 
-Metadata Caching:
+Metadata Caching: Pending
     Create way to cache and save metadata on gracefull shutdown and then load it
 back up. Store metadata in its own object and then append reference to a Log
 $PREFIX:SERVER:metadata key On load, append some sort of invalidation notice
 (NULL REFERENCE?) to $PREFIX:SERVER:metadata so we know its not to be trusted
 until a fresh one is written
 
-Manifest:
+Manifest: Pending
     Instead of hashing keys to their data/index objects, map them to random Ids
 so they can be changed in future.  This will allow reindexing and arbitrarily
 re-writing any particular timeseries. Load manifest file at runtime, append to
 it as necessary.
 
-Manifest Object Log:
+Manifest Object Log: Pending
     Write out the manifest every time it changes, append <timepoint, Id> to a
 single Log object, so we can retrieve the manifest from any point in
 time/rewrite it entirely.
 
-Time_Series_Header:
+Metadata Dump: Pending
+    Should be able to query the database for a HR (JSON?) dump of the server's
+metadata.  Includes Manifest, Metadata, and at least some metadata about
+Indices.
+
+Performance Tracking: Pending
+    Should be able to use timing information necessary for logging to keep the
+timing/size information for the last operation of any particular type  in some
+fixed global place that can be sampled at will. Also track aggregate
+statistics per operation type in some fixed global space that can be
+queried/updated atomically.
+
+Time_Series_Header: Pending
     Have a header of some sort that records the Time_Series type (Fixed Width,
 Variable Width, Fixed Interval, Variable Interval) and anything else that might
 be handy.  Store this header in the Manifest Object? At the beginning of each
 Time_Series Object?
+
+Wire Protocol: Pending
+    A Capn'Proto based wire protocol to allow a remote FTS Server to be used in
+place of an embedded one.  Local and Remote are two implementations of the same
+database specification.
