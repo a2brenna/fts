@@ -6,7 +6,10 @@ PREFIX=/usr
 CXX=g++
 CXXFLAGS=-L${LIBRARY_DIR} -I${INCLUDE_DIR} -O2 -g -std=c++14 -fPIC -Wall -Wextra -march=native
 
-all: ftsd
+all: ftsd fts
+
+fts: src/fts.cc server.o metadata.o archive.o index.o
+	${CXX} ${CXXFLAGS} -o fts src/fts.cc server.o metadata.o archive.o index.o -lboost_program_options -lrtosfs -lsodium
 
 ftsd: src/ftsd.cc server.o metadata.o archive.o index.o
 	${CXX} ${CXXFLAGS} -o ftsd src/ftsd.cc server.o metadata.o archive.o index.o -lboost_program_options -lrtosfs -lsodium

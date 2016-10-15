@@ -64,3 +64,6 @@ one exist.
 Re-Index: Pending
     Ability to re-index a Timeseries on the fly and update the Manifest
 accordingly.
+
+Intersection Query Specifications:
+    Allow queries to specify subsets and find the intersection.
