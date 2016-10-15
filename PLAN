@@ -1,4 +1,4 @@
-Index: Implemented, needs testing and simpler re-implementation
+Index: Implemented, needs testing
     Index each timeseries every k elements by appending a record of <timestamp,
 element_number, offset> and have Index objects return bounds <n, n + j> when
 queried to give the minimal chunk of the Archive to be retrieved/searched for
@@ -10,6 +10,10 @@ Seperate Server/Client namespace: Pending
     Prefix all internal server object keys with $PREFIX:SERVER: and all client
 keys with $PREFIX:CLIENT.  Prevents clients from accidentally/deliberately
 messing with objects used for internal server bookkeeping.
+
+Commandline tools: Pending
+    Command line tool for appending streams of data, bulk import/export and
+queries.
 
 Metadata Caching: Pending
     Create way to cache and save metadata on gracefull shutdown and then load it
@@ -51,3 +55,12 @@ Wire Protocol: Pending
     A Capn'Proto based wire protocol to allow a remote FTS Server to be used in
 place of an embedded one.  Local and Remote are two implementations of the same
 database specification.
+
+Deep Scrub: Pending
+    Check integrity of all Timeseries in the Manifest.  Check the Timeseries
+against the Metadata cache if one exists. Also check against the Index, should
+one exist.
+
+Re-Index: Pending
+    Ability to re-index a Timeseries on the fly and update the Manifest
+accordingly.
