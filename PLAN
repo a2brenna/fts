@@ -6,6 +6,10 @@ the data in question.  Index records are fixed width (24 bytes) so we can binary
 search an Index quickly (since we can't binary search variable width
 Time_Series).
 
+Seperate Database Interface Specification: Pending
+    Seperate specificaton of database API from implementation to allow multiple
+remote/local implementations.
+
 Seperate Server/Client namespace: Pending
     Prefix all internal server object keys with $PREFIX:SERVER: and all client
 keys with $PREFIX:CLIENT.  Prevents clients from accidentally/deliberately
