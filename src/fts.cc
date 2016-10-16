@@ -35,7 +35,7 @@ int main(int argc, char* argv[]){
         ("append", po::bool_switch(&append), "Append data to timeseries")
         ("query_time", po::bool_switch(&query_time), "Query timeseries by time window")
         ("query_index", po::bool_switch(&query_index), "Query timeseries by index window")
-        ("all", po::bool_switch(&query_index), "Fetch entire timeseries")
+        ("all", po::bool_switch(&all), "Fetch entire timeseries")
         ("data", po::value<std::string>(&data), "Data to append")
         ("timestamp", po::value<uint64_t>(&timestamp), "Timestamp to append data at")
         ("start_time", po::value<uint64_t>(&start_time), "Start time of query window")
