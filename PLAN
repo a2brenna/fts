@@ -6,6 +6,9 @@ the data in question.  Index records are fixed width (24 bytes) so we can binary
 search an Index quickly (since we can't binary search variable width
 Time_Series).
 
+Intersection Query Specifications: Pending
+    Allow queries to specify subsets and find the intersection.
+
 Seperate Database Interface Specification: Pending
     Seperate specificaton of database API from implementation to allow multiple
 remote/local implementations.
@@ -68,6 +71,3 @@ one exist.
 Re-Index: Pending
     Ability to re-index a Timeseries on the fly and update the Manifest
 accordingly.
-
-Intersection Query Specifications:
-    Allow queries to specify subsets and find the intersection.
