@@ -11,8 +11,8 @@ all: ftsd fts
 fts: src/fts.cc server.o metadata.o archive.o index.o wire_protocol.o
 	${CXX} ${CXXFLAGS} -o fts src/fts.cc server.o metadata.o archive.o index.o wire_protocol.o -lboost_program_options -lrtosfs -lsodium -lcapnp -lkj
 
-ftsd: src/ftsd.cc server.o metadata.o archive.o index.o
-	${CXX} ${CXXFLAGS} -o ftsd src/ftsd.cc server.o metadata.o archive.o index.o wire_protocol.o -lboost_program_options -lrtosfs -lsodium -lcapnp -lkj
+ftsd: src/ftsd.cc server.o metadata.o archive.o index.o wire_protocol.o internal.o
+	${CXX} ${CXXFLAGS} -o ftsd src/ftsd.cc server.o metadata.o archive.o index.o wire_protocol.o internal.o -lboost_program_options -lrtosfs -lsodium -lcapnp -lkj
 
 server.o: src/server.cc src/server.h
 	    ${CXX} ${CXXFLAGS} -c src/server.cc -o server.o
@@ -31,6 +31,12 @@ src/wire_protocol.capnp.c++: src/wire_protocol.capnp
 
 wire_protocol.o: src/wire_protocol.capnp.c++
 	    ${CXX} ${CXXFLAGS} -c src/wire_protocol.capnp.c++ -o wire_protocol.o
+
+src/internal.capnp.c++: src/internal.capnp
+	    capnp compile -oc++ src/internal.capnp
+
+internal.o: src/internal.capnp.c++
+	    ${CXX} ${CXXFLAGS} -c src/internal.capnp.c++ -o internal.o
 
 clean:
 	rm -f ftsd
