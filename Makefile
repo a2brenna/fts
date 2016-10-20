@@ -11,14 +11,20 @@ all: ftsd fts
 fts: src/fts.cc server.o metadata.o archive.o index.o wire_protocol.o
 	${CXX} ${CXXFLAGS} -o fts src/fts.cc server.o metadata.o archive.o index.o wire_protocol.o -lboost_program_options -lrtosfs -lsodium -lcapnp -lkj
 
-ftsd: src/ftsd.cc server.o metadata.o archive.o index.o wire_protocol.o internal.o
-	${CXX} ${CXXFLAGS} -o ftsd src/ftsd.cc server.o metadata.o archive.o index.o wire_protocol.o internal.o -lboost_program_options -lrtosfs -lsodium -lcapnp -lkj
+ftsd: src/ftsd.cc server.o metadata.o archive.o index.o wire_protocol.o internal.o metadata_cache.o manifest.o
+	${CXX} ${CXXFLAGS} -o ftsd src/ftsd.cc server.o metadata.o archive.o index.o wire_protocol.o internal.o metadata_cache.o manifest.o -lboost_program_options -lrtosfs -lsodium -lcapnp -lkj
 
 server.o: src/server.cc src/server.h
 	    ${CXX} ${CXXFLAGS} -c src/server.cc -o server.o
 
 metadata.o: src/metadata.cc src/metadata.h
 	    ${CXX} ${CXXFLAGS} -c src/metadata.cc -o metadata.o
+
+metadata_cache.o: src/metadata_cache.cc src/metadata_cache.h
+	    ${CXX} ${CXXFLAGS} -c src/metadata_cache.cc -o metadata_cache.o
+
+manifest.o: src/manifest.cc src/manifest.h
+	    ${CXX} ${CXXFLAGS} -c src/manifest.cc -o manifest.o
 
 archive.o: src/archive.cc src/archive.h
 	    ${CXX} ${CXXFLAGS} -c src/archive.cc -o archive.o
