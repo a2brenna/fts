@@ -17,6 +17,7 @@ class Archive {
         std::string current_data() const;
         std::string current_record() const;
         std::string remainder() const;
+        std::string str() const;
 
         void next_record();
 

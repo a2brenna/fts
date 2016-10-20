@@ -20,6 +20,8 @@ class Index{
         std::pair<size_t, size_t> lookup(const std::chrono::high_resolution_clock::time_point &s, const std::chrono::high_resolution_clock::time_point &e);
         std::pair<size_t, size_t> lookup(const size_t &s, const size_t &e);
 
+        std::string str() const;
+
     private:
         std::vector<Index_Record> _index;
 

@@ -81,6 +81,11 @@ public:
   std::string intervalt(const std::string &key, const std::chrono::milliseconds &start,
             const std::chrono::milliseconds &end);
 
+  /* Returns a human readable string detailing the Server's current metadata
+   * and internal state
+   */
+  std::string str() const;
+
 private:
   std::shared_ptr<Object_Store> _backend;
   std::string _prefix;

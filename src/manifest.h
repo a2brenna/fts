@@ -3,9 +3,13 @@
 
 #include <mutex>
 #include <memory>
+#include <string>
 #include <rtos/object_store.h>
 
 class Manifest {
+
+    public:
+        std::string str() const;
 
     private:
         mutable std::mutex _lock;
