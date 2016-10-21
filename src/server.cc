@@ -29,8 +29,8 @@ std::shared_ptr<Metadata> Server::_unsafe_get_metadata(const std::string &key){
         const std::string backend_key = _prefix + key;
 
         try{
-            //TODO: return pointer to Data if we have to fetch it since we might need it to save ourselves a fetch
-            const Data data = _backend->fetch(backend_key);
+            //TODO: return pointer to Object if we have to fetch it since we might need it to save ourselves a fetch
+            const Object data = _backend->fetch(backend_key);
 
             const char *record = data.data().c_str();
             const char *archive_end = record + data.data().size();
@@ -158,7 +158,7 @@ std::string Server::all(const std::string &key){
     //Does not require metadata/lock, atomic r/w property of backend ensures we only get complete archives
     const std::string backend_key = _prefix + key;
     try{
-        const Data d = _backend->fetch(backend_key);
+        const Object d = _backend->fetch(backend_key);
         return d.data();
     }
     catch(E_OBJECT_DNE){
