@@ -95,10 +95,12 @@ private:
   std::map<std::string, std::shared_ptr<Metadata>> _metadata;
   mutable std::mutex _metadata_lock;
 
-  std::string _calc_address(const std::string &key) const;
   std::shared_ptr<Metadata> _unsafe_get_metadata(const std::string &key);
   std::shared_ptr<Metadata> _get_metadata(const std::string &key);
   std::shared_ptr<Metadata> _get_or_create_metadata(const std::string &key);
+
+  Ref _ts_ref(const std::string &key) const;
+  Ref _index_ref(const std::string &key) const;
 
 };
 

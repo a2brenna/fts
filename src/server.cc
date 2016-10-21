@@ -9,6 +9,14 @@ Server::Server(std::shared_ptr<Object_Store> backend, const std::string &prefix)
     _prefix = prefix;
 }
 
+Ref Server::_ts_ref(const std::string &key) const{
+    return Ref(_prefix + ":client_timeseries:" + key);
+}
+
+Ref Server::_index_ref(const std::string &key) const{
+    return Ref(_prefix + ":client_index:" + key);
+}
+
 uint64_t record_extract_timestamp(const char *record){
     return *(uint64_t *)(record);
 }
@@ -26,11 +34,9 @@ std::shared_ptr<Metadata> Server::_unsafe_get_metadata(const std::string &key){
         return _metadata.at(key);
     }
     catch(std::out_of_range metadata_dne){
-        const std::string backend_key = _prefix + key;
-
         try{
             //TODO: return pointer to Object if we have to fetch it since we might need it to save ourselves a fetch
-            const Object data = _backend->fetch(backend_key);
+            const Object data = _backend->fetch(_ts_ref(key));
 
             const char *record = data.data().c_str();
             const char *archive_end = record + data.data().size();
@@ -98,9 +104,6 @@ bool Server::append(const std::string &key, const std::chrono::milliseconds &tim
     i.index = metadata->num_elements;
     i.timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(metadata->last_timestamp.time_since_epoch()).count();
 
-
-    const std::string backend_key = _prefix + key;
-
     const uint64_t data_size = data.size();
     const uint64_t data_timestamp = time.count();
 
@@ -109,7 +112,7 @@ bool Server::append(const std::string &key, const std::chrono::milliseconds &tim
     backend_string.append( (char *)&data_size, sizeof(uint64_t) );
     backend_string.append( data );
 
-    _backend->append(backend_key, backend_string);
+    _backend->append(_ts_ref(key), backend_string);
 
     metadata->last_timestamp = t;
     metadata->size += backend_string.size();
@@ -120,8 +123,7 @@ bool Server::append(const std::string &key, const std::chrono::milliseconds &tim
         std::string index_string;
         index_string.append( (char *)&i, sizeof(Index_Record));
 
-        const std::string index_key = backend_key + ".index";
-        _backend->append(index_key, index_string);
+        _backend->append(_index_ref(key), index_string);
     }
     return true;
 }
@@ -138,12 +140,9 @@ std::string Server::lastn(const std::string &key, const unsigned long long &num_
     std::shared_ptr<Metadata> metadata = _get_metadata(key);
     std::unique_lock<std::mutex> m(metadata->lock);
 
-    const std::string backend_key = _prefix + key;
+    const std::string index_string = _backend->fetch(_ts_ref(key)).data();
 
-    const std::string index_key = backend_key + ".index";
-    const std::string index_string = _backend->fetch(index_key).data();
-
-    Archive a(_backend->fetch(backend_key).data());
+    Archive a(_backend->fetch(_index_ref(key)).data());
 
     const size_t lower_bound = std::max((ssize_t)0, (ssize_t)metadata->num_elements - (ssize_t)num_entries);
 
@@ -156,9 +155,8 @@ std::string Server::lastn(const std::string &key, const unsigned long long &num_
 
 std::string Server::all(const std::string &key){
     //Does not require metadata/lock, atomic r/w property of backend ensures we only get complete archives
-    const std::string backend_key = _prefix + key;
     try{
-        const Object d = _backend->fetch(backend_key);
+        const Object d = _backend->fetch(_ts_ref(key));
         return d.data();
     }
     catch(E_OBJECT_DNE){
@@ -171,12 +169,9 @@ std::string Server::intervalt(const std::string &key, const std::chrono::millise
     std::shared_ptr<Metadata> metadata = _get_metadata(key);
     std::unique_lock<std::mutex> m(metadata->lock);
 
-    const std::string backend_key = _prefix + key;
+    const std::string index_string = _backend->fetch(_index_ref(key)).data();
 
-    const std::string index_key = backend_key + ".index";
-    const std::string index_string = _backend->fetch(index_key).data();
-
-    Archive a(_backend->fetch(backend_key).data());
+    Archive a(_backend->fetch(_ts_ref(key)).data());
 
     const std::chrono::high_resolution_clock::time_point s(start);
     const std::chrono::high_resolution_clock::time_point e(end);

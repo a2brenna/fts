@@ -13,10 +13,10 @@ Seperate Database Interface Specification: Pending
     Seperate specificaton of database API from implementation to allow multiple
 remote/local implementations.
 
-Seperate Server/Client namespace: Pending
-    Prefix all internal server object keys with $PREFIX:SERVER: and all client
-keys with $PREFIX:CLIENT.  Prevents clients from accidentally/deliberately
-messing with objects used for internal server bookkeeping.
+Seperate Server/Client namespace: Implemented
+    Prefix all client keys with $PREFIX:client_{timeseries,index}.  Prevents
+clients from accidentally/deliberately messing with objects used for internal
+server bookkeeping.
 
 Commandline tools: Pending
     Command line tool for appending streams of data, bulk import/export and
