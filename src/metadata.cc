@@ -5,11 +5,6 @@ Metadata::Metadata(){
 
 }
 
-Metadata::Metadata(const Ref &data_ref, std::shared_ptr<Object_Store> backend){
-
-
-}
-
 Metadata::Metadata(const Ref &data_ref, std::shared_ptr<Object_Store> backend, const size_t &index, const size_t &offset){
     Archive partial(backend->fetch_from(data_ref, offset).data());
     last_timestamp = partial.current_time();
