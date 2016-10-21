@@ -122,14 +122,10 @@ std::string Server::lastn(const std::string &key, const unsigned long long &num_
 }
 
 std::string Server::all(const std::string &key){
-    //Does not require metadata/lock, atomic r/w property of backend ensures we only get complete archives
-    try{
-        const Object d = _backend->fetch(_ts_ref(key));
-        return d.data();
-    }
-    catch(E_OBJECT_DNE){
-        throw E_TIMESERIES_DNE();
-    }
+    std::shared_ptr<Metadata> metadata = _get_metadata(key);
+    std::unique_lock<std::mutex> m(metadata->lock);
+    const Object d = _backend->fetch(_ts_ref(key));
+    return d.data();
 }
 
 std::string Server::intervalt(const std::string &key, const std::chrono::milliseconds &start,
