@@ -14,6 +14,7 @@ class Archive {
         Archive();
         std::chrono::high_resolution_clock::time_point current_time() const;
         size_t current_index() const;
+        size_t size() const;
         std::string current_data() const;
         std::string current_record() const;
         std::string remainder() const;

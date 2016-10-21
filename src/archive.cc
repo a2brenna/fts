@@ -18,6 +18,10 @@ size_t Archive::current_index() const{
     return _current_index;
 }
 
+size_t Archive::size() const{
+    return _archive.size();
+}
+
 std::string Archive::current_data() const{
     const size_t data_size = *(uint64_t *)(&_archive[_cursor] + sizeof(uint64_t));
     if( (_cursor + data_size + sizeof(uint64_t) * 2) > _archive.size() ){
