@@ -142,7 +142,7 @@ std::string Server::lastn(const std::string &key, const unsigned long long &num_
 
     const std::string index_string = _backend->fetch(_ts_ref(key)).data();
 
-    Archive a(_backend->fetch(_index_ref(key)).data());
+    Archive a(_backend->fetch(_ts_ref(key)).data());
 
     const size_t lower_bound = std::max((ssize_t)0, (ssize_t)metadata->num_elements - (ssize_t)num_entries);
 
