@@ -48,7 +48,7 @@ void Archive::next_record(){
     const size_t record_size = *(uint64_t *)(&_archive[_cursor] + sizeof(uint64_t));
     const size_t new_cursor = _cursor + sizeof(uint64_t) * 2 + record_size;
 
-    if(new_cursor > _archive.size()){
+    if(new_cursor >= _archive.size()){
         throw E_END_OF_ARCHIVE();
     }
     else{
