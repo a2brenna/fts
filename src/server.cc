@@ -93,10 +93,7 @@ bool Server::append(const std::string &key, const std::chrono::milliseconds &tim
 
     if(write_index){
         static_assert(sizeof(Index_Record) == 24, "Index_Record is not 24 bytes");
-        std::string index_string;
-        index_string.append( (char *)&i, sizeof(Index_Record));
-
-        _backend->append(_index_ref(key), index_string);
+        _backend->append(_index_ref(key), (char *)&i, sizeof(Index_Record));
     }
     return true;
 }
@@ -112,8 +109,6 @@ bool Server::append_archive(const std::string &key, const Archive &archive){
 std::string Server::lastn(const std::string &key, const unsigned long long &num_entries){
     std::shared_ptr<Metadata> metadata = _get_metadata(key);
     std::unique_lock<std::mutex> m(metadata->lock);
-
-    const std::string index_string = _backend->fetch(_ts_ref(key)).data();
 
     Archive a(_backend->fetch(_ts_ref(key)).data());
 
@@ -141,8 +136,6 @@ std::string Server::intervalt(const std::string &key, const std::chrono::millise
             const std::chrono::milliseconds &end){
     std::shared_ptr<Metadata> metadata = _get_metadata(key);
     std::unique_lock<std::mutex> m(metadata->lock);
-
-    const std::string index_string = _backend->fetch(_index_ref(key)).data();
 
     Archive a(_backend->fetch(_ts_ref(key)).data());
 
