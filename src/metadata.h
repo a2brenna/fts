@@ -3,6 +3,9 @@
 
 #include <chrono>
 #include <mutex>
+#include <memory>
+#include <rtos/types.h>
+#include <rtos/object_store.h>
 
 class Metadata {
 
@@ -13,6 +16,8 @@ class Metadata {
         std::chrono::high_resolution_clock::time_point last_timestamp;
 
         Metadata();
+        Metadata(const Ref &data_ref, std::shared_ptr<Object_Store> backend);
+        Metadata(const Ref &data_ref, std::shared_ptr<Object_Store> backend, const size_t &index, const size_t &offset);
 
 };
 
