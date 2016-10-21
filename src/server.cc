@@ -36,22 +36,7 @@ std::shared_ptr<Metadata> Server::_unsafe_get_metadata(const std::string &key){
     catch(std::out_of_range metadata_dne){
         try{
             //TODO: return pointer to Object if we have to fetch it since we might need it to save ourselves a fetch
-            const Object data = _backend->fetch(_ts_ref(key));
-
-            const char *record = data.data().c_str();
-            const char *archive_end = record + data.data().size();
-            size_t num_elements = 0;
-            uint64_t latest_timestamp = 0;
-            while(record < archive_end){
-                num_elements++;
-                latest_timestamp = record_extract_timestamp(record);
-                record += record_extract_size(record) + (sizeof(uint64_t) * 2);
-            }
-
-            std::shared_ptr<Metadata> m(new Metadata());
-            m->num_elements = num_elements;
-            m->last_timestamp = std::chrono::high_resolution_clock::time_point(std::chrono::milliseconds(latest_timestamp));
-            m->size = data.data().size();
+            std::shared_ptr<Metadata> m(new Metadata(_ts_ref(key), _backend, 0, 0));
             _metadata.insert(std::pair<std::string, std::shared_ptr<Metadata>>(key, m));
             return m;
         }
