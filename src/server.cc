@@ -17,18 +17,6 @@ Ref Server::_index_ref(const std::string &key) const{
     return Ref(_prefix + ":client_index:" + key);
 }
 
-uint64_t record_extract_timestamp(const char *record){
-    return *(uint64_t *)(record);
-}
-
-uint64_t record_extract_size(const char *record){
-    return *(uint64_t *)(record + sizeof(uint64_t));
-}
-
-std::string record_extract_data(const char* record){
-    return std::string(record + (sizeof(uint64_t) * 2), record_extract_size(record));
-}
-
 std::shared_ptr<Metadata> Server::_unsafe_get_metadata(const std::string &key){
     try{
         return _metadata.at(key);
