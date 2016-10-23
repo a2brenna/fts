@@ -1,6 +1,7 @@
 #include "index.h"
 #include <cassert>
 #include <cstring>
+#include <sstream>
 
 Index::Index(const std::string &serialized_index){
     const size_t index_bytes = serialized_index.size();
@@ -9,7 +10,7 @@ Index::Index(const std::string &serialized_index){
         throw E_CORRUPT_INDEX();
     }
 
-    _index.reserve(index_bytes / sizeof(Index_Record));
+    _index.resize(index_bytes / sizeof(Index_Record));
     std::memcpy(_index.data(), &serialized_index[0], index_bytes);
 
     _consistency_check();
@@ -84,4 +85,15 @@ std::pair<size_t, size_t> Index::lookup(const std::chrono::high_resolution_clock
     }
 
     return r;
+}
+
+std::string Index::str() const{
+    std::stringstream s;
+    for(const auto &i: _index){
+        s << i.offset << " ";
+        s << i.index << " ";
+        s << i.timestamp << " ";
+        s << std::endl;
+    }
+    return s.str();
 }

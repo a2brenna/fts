@@ -157,3 +157,9 @@ std::string Server::intervalt(const std::string &key, const std::chrono::millise
     return output;
 
 }
+
+Index Server::index(const std::string &key){
+    const Ref index_ref = _index_ref(key);
+    const std::string serialized_index = _backend->fetch(index_ref).data();
+    return Index(serialized_index);
+}

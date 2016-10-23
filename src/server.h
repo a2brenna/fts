@@ -8,6 +8,7 @@
 #include <mutex>
 #include <rtos/object_store.h>
 
+#include "index.h"
 #include "metadata.h"
 
 class E_TIMESERIES_DNE {};
@@ -80,6 +81,10 @@ public:
   //TODO:
   std::string intervalt(const std::string &key, const std::chrono::milliseconds &start,
             const std::chrono::milliseconds &end);
+
+  /* Returns the Index associated with a key
+   */
+  Index index(const std::string &ke);
 
   /* Returns a human readable string detailing the Server's current metadata
    * and internal state
