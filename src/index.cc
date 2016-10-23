@@ -36,7 +36,7 @@ std::pair<size_t, size_t> Index::lookup(const size_t &s, const size_t &e){
 
     //TODO: Replace with binary search
     size_t c = 0;
-    for( ; c < _index.size(); c += 24){
+    for( ; c < _index.size(); c++){
         if ( _index[c].index > s ){
             break;
         }
@@ -45,7 +45,7 @@ std::pair<size_t, size_t> Index::lookup(const size_t &s, const size_t &e){
         }
     }
 
-    for( ; c < _index.size(); c += 24){
+    for( ; c < _index.size(); c++){
         if ( _index[c].index > e ){
             break;
         }
@@ -65,7 +65,7 @@ std::pair<size_t, size_t> Index::lookup(const std::chrono::high_resolution_clock
 
     //TODO: Replace with binary search
     size_t c = 0;
-    for( ; c < _index.size(); c += 24){
+    for( ; c < _index.size(); c++){
         if ( _index[c].timestamp > s ){
             break;
         }
@@ -74,7 +74,7 @@ std::pair<size_t, size_t> Index::lookup(const std::chrono::high_resolution_clock
         }
     }
 
-    for( ; c < _index.size(); c += 24){
+    for( ; c < _index.size(); c++){
         if ( _index[c].timestamp > e ){
             break;
         }
