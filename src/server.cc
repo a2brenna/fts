@@ -74,8 +74,8 @@ bool Server::append(const std::string &key, const std::chrono::milliseconds &tim
 
     Index_Record i;
     i.offset = metadata->size;
-    i.index = metadata->num_elements;
-    i.timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(metadata->last_timestamp.time_since_epoch()).count();
+    i.index = metadata->num_elements + 1;
+    i.timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(t.time_since_epoch()).count();
 
     const uint64_t data_size = data.size();
     const uint64_t data_timestamp = time.count();
