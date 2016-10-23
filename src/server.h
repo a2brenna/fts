@@ -78,13 +78,17 @@ public:
   * start: 0 <= end
   * end: 0 >= start
   */
-  //TODO:
   std::string intervalt(const std::string &key, const std::chrono::milliseconds &start,
             const std::chrono::milliseconds &end);
 
+  std::string query(const std::string &key,
+            const std::chrono::milliseconds &youngest, const std::chrono::milliseconds &oldest,
+            const size_t &min_index, const size_t &max_index,
+            const size_t &tail_size, const std::chrono::milliseconds &tail_age);
+
   /* Returns the Index associated with a key
    */
-  Index index(const std::string &ke);
+  Index index(const std::string &key);
 
   /* Returns a human readable string detailing the Server's current metadata
    * and internal state

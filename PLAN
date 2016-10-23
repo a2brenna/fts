@@ -1,13 +1,15 @@
 Index: Implemented, needs testing
     Index each timeseries every k elements by appending a record of <timestamp,
-element_number, offset> and have Index objects return bounds <n, n + j> when
-queried to give the minimal chunk of the Archive to be retrieved/searched for
-the data in question.  Index records are fixed width (24 bytes) so we can binary
-search an Index quickly (since we can't binary search variable width
-Time_Series).
+element_number, offset>.
 
 Intersection Query Specifications: Pending
     Allow queries to specify subsets and find the intersection.
+
+Accelerated Queries: Pending
+    Have Index objects return bounds <n, n + j> when queried to give the minimal
+chunk of the Archive to be retrieved/searched for the data in question.  Index
+records are fixed width (24 bytes) so we can binary search an Index quickly
+(since we can't binary search variable width Time_Series).
 
 Seperate Database Interface Specification: Pending
     Seperate specificaton of database API from implementation to allow multiple

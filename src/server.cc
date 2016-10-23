@@ -4,6 +4,12 @@
 #include "archive.h"
 #include "index.h"
 
+const size_t MIN_INDEX = 0;
+const size_t MAX_INDEX = std::numeric_limits<size_t>::max();
+
+const auto MIN_TIMESTAMP = std::chrono::milliseconds::min();
+const auto MAX_TIMESTAMP = std::chrono::milliseconds::max();
+
 Server::Server(std::shared_ptr<Object_Store> backend, const std::string &prefix){
     _backend = backend;
     _prefix = prefix;
@@ -107,6 +113,8 @@ bool Server::append_archive(const std::string &key, const Archive &archive){
 */
 
 std::string Server::lastn(const std::string &key, const unsigned long long &num_entries){
+    return query(key, MIN_TIMESTAMP, MAX_TIMESTAMP, MIN_INDEX, MAX_INDEX, num_entries, MAX_TIMESTAMP);
+    /*
     std::shared_ptr<Metadata> metadata = _get_metadata(key);
     std::unique_lock<std::mutex> m(metadata->lock);
 
@@ -119,6 +127,7 @@ std::string Server::lastn(const std::string &key, const unsigned long long &num_
     }
 
     return a.remainder();
+    */
 }
 
 std::string Server::all(const std::string &key){
@@ -130,6 +139,8 @@ std::string Server::all(const std::string &key){
 
 std::string Server::intervalt(const std::string &key, const std::chrono::milliseconds &start,
             const std::chrono::milliseconds &end){
+    return query(key, start, end, MIN_INDEX, MAX_INDEX, MAX_INDEX, MAX_TIMESTAMP);
+    /*
     std::shared_ptr<Metadata> metadata = _get_metadata(key);
     std::unique_lock<std::mutex> m(metadata->lock);
 
@@ -155,7 +166,54 @@ std::string Server::intervalt(const std::string &key, const std::chrono::millise
     }
 
     return output;
+    */
 
+}
+
+std::string Server::query(const std::string &key,
+    const std::chrono::milliseconds &youngest, const std::chrono::milliseconds &oldest,
+    const size_t &min_index, const size_t &max_index,
+    const size_t &tail_size, const std::chrono::milliseconds &tail_age){
+
+    assert(youngest >= oldest);
+    assert(max_index >= min_index);
+
+    std::shared_ptr<Metadata> metadata = _get_metadata(key);
+    std::unique_lock<std::mutex> m(metadata->lock);
+
+    const size_t last_index = metadata->num_elements - 1;
+    const auto now = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now().time_since_epoch());
+
+    const size_t bounded_min_index = std::max(min_index, last_index - tail_size);
+    const size_t bounded_max_index = std::min(max_index, last_index);
+    assert(bounded_min_index >= bounded_max_index);
+
+    const std::chrono::high_resolution_clock::time_point bounded_min_timestamp(std::max(oldest, now - tail_age));
+    const std::chrono::high_resolution_clock::time_point bounded_max_timestamp(std::min(youngest, now));
+    assert(bounded_min_timestamp >= bounded_max_timestamp);
+
+    std::string output;
+
+    Archive a(_backend->fetch(_ts_ref(key)).data());
+
+    try{
+        size_t i = 0;
+        while( (a.current_time() < bounded_min_timestamp) || (i < bounded_min_index) ){
+            a.next_record();
+            i++;
+        }
+
+        while( (a.current_time() <= bounded_max_timestamp) || (i <= bounded_max_index) ){
+            output.append(a.current_record());
+            a.next_record();
+            i++;
+        }
+    }
+    catch(E_END_OF_ARCHIVE e){
+
+    }
+
+    return output;
 }
 
 Index Server::index(const std::string &key){
