@@ -9,10 +9,10 @@ CXXFLAGS=-L${LIBRARY_DIR} -I${INCLUDE_DIR} -O2 -g -std=c++14 -fPIC -Wall -Wextra
 all: ftsd fts
 
 fts: src/fts.cc server.o metadata.o archive.o index.o wire_protocol.o
-	${CXX} ${CXXFLAGS} -o fts src/fts.cc server.o metadata.o archive.o index.o wire_protocol.o -lboost_program_options -lrtosfs -lsodium -lcapnp -lkj
+	${CXX} ${CXXFLAGS} -o fts src/fts.cc server.o metadata.o archive.o index.o wire_protocol.o -lboost_program_options -lrtosfs -lsodium -lcapnp -lkj -lsmplsocket
 
 ftsd: src/ftsd.cc server.o metadata.o archive.o index.o wire_protocol.o internal.o metadata_cache.o manifest.o
-	${CXX} ${CXXFLAGS} -o ftsd src/ftsd.cc server.o metadata.o archive.o index.o wire_protocol.o internal.o metadata_cache.o manifest.o -lboost_program_options -lrtosfs -lsodium -lcapnp -lkj
+	${CXX} ${CXXFLAGS} -o ftsd src/ftsd.cc server.o metadata.o archive.o index.o wire_protocol.o internal.o metadata_cache.o manifest.o -lboost_program_options -lrtosfs -lsodium -lcapnp -lkj -lsmplsocket -lpthread
 
 server.o: src/server.cc src/server.h
 	    ${CXX} ${CXXFLAGS} -c src/server.cc -o server.o
