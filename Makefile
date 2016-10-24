@@ -6,19 +6,19 @@ PREFIX=/usr
 CXX=g++
 CXXFLAGS=-L${LIBRARY_DIR} -I${INCLUDE_DIR} -O2 -g -std=c++14 -fPIC -Wall -Wextra -march=native
 
-all: ftsd
+all: ftsd fts
 
-fts: src/fts.cc metadata.o archive.o index.o wire_protocol.o
-	${CXX} ${CXXFLAGS} -o fts src/fts.cc metadata.o archive.o index.o wire_protocol.o -lboost_program_options -lrtosfs -lsodium -lcapnp -lkj -lsmplsocket
+fts: src/fts.cc metadata.o archive.o index.o wire_protocol.o database.o remote_database.o
+	${CXX} ${CXXFLAGS} -o fts src/fts.cc metadata.o archive.o index.o wire_protocol.o database.o remote_database.o -lboost_program_options -lrtosfs -lsodium -lcapnp -lkj -lsmplsocket
 
 ftsd: src/ftsd.cc database.o local_database.o metadata.o archive.o index.o wire_protocol.o internal.o metadata_cache.o manifest.o
 	${CXX} ${CXXFLAGS} -o ftsd src/ftsd.cc database.o local_database.o metadata.o archive.o index.o wire_protocol.o internal.o metadata_cache.o manifest.o -lboost_program_options -lrtosfs -lsodium -lcapnp -lkj -lsmplsocket -lpthread
 
-#server.o: src/server.cc src/server.h
-#	    ${CXX} ${CXXFLAGS} -c src/server.cc -o server.o
-
 database.o: src/database.cc src/database.h
 	    ${CXX} ${CXXFLAGS} -c src/database.cc -o database.o
+
+remote_database.o: src/remote_database.cc src/remote_database.h
+	    ${CXX} ${CXXFLAGS} -c src/remote_database.cc -o remote_database.o
 
 local_database.o: src/local_database.cc src/local_database.h
 	    ${CXX} ${CXXFLAGS} -c src/local_database.cc -o local_database.o

@@ -1,17 +1,16 @@
 #include <iostream>
 #include <string>
 #include <boost/program_options.hpp>
-#include <rtos/fs_store.h>
 #include <cassert>
 #include <memory>
 #include <thread>
+#include <smplsocket.h>
 
-#include "server.h"
+#include "remote_database.h"
 
 namespace po = boost::program_options;
 
-std::string DIRECTORY = "./fts.db";
-std::string PREFIX;
+std::string UNIX_DOMAIN_SOCKET;
 
 int main(int argc, char* argv[]){
     std::string timeseries;
@@ -29,8 +28,7 @@ int main(int argc, char* argv[]){
 
 	po::options_description desc("Options");
 	desc.add_options()
-        ("directory", po::value<std::string>(&DIRECTORY), "Backend storage directory")
-        ("prefix", po::value<std::string>(&PREFIX), "Unique database name")
+        ("uds", po::value<std::string>(&UNIX_DOMAIN_SOCKET), "Server Unix Domain Socket")
         ("timeseries", po::value<std::string>(&timeseries), "Timeseries to operate on/query")
         ("append", po::bool_switch(&append), "Append data to timeseries")
         ("query_time", po::bool_switch(&query_time), "Query timeseries by time window")
@@ -49,22 +47,17 @@ int main(int argc, char* argv[]){
 	po::store(po::parse_command_line(argc, argv, desc), vm);
     po::notify(vm);
 
-    if(PREFIX.size() > 0){
-        std::cout << "Empty prefix not supported" << std::endl;
-        return 1;
-    }
+    assert(UNIX_DOMAIN_SOCKET.size() > 0);
 
-    std::shared_ptr<Object_Store> backend(new FS_Store(DIRECTORY, 5, 1));
-
-    Server server(backend, PREFIX);
+    std::shared_ptr<Database> server(new Remote_Database(std::shared_ptr<smpl::Remote_Address>(new smpl::Remote_UDS(UNIX_DOMAIN_SOCKET))));
 
     if(append && (data.size() != 0)){
         if(timestamp == std::numeric_limits<uint64_t>::min()){
             //No timestamp provided?
-            server.append(timeseries, data);
+            server->append(timeseries, data);
         }
         else{
-            server.append(timeseries, std::chrono::milliseconds(timestamp), data);
+            server->append(timeseries, std::chrono::milliseconds(timestamp), data);
         }
         return 0;
     }
@@ -73,7 +66,7 @@ int main(int argc, char* argv[]){
 
     if(query_time){
         if(start_time < end_time){
-            result = server.intervalt(timeseries, std::chrono::milliseconds(start_time), std::chrono::milliseconds(end_time));
+            result = server->intervalt(timeseries, std::chrono::milliseconds(start_time), std::chrono::milliseconds(end_time));
         }
         else{
             std::cout << desc << std::endl;
@@ -93,10 +86,10 @@ int main(int argc, char* argv[]){
         */
     }
     else if(tail > 0){
-        result = server.lastn(timeseries, tail);
+        result = server->lastn(timeseries, tail);
     }
     else if(all){
-        result = server.all(timeseries);
+        result = server->all(timeseries);
     }
     else{
         std::cout << desc << std::endl;
