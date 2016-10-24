@@ -1,30 +1,19 @@
-#ifndef __FTS_SERVER_H__
-#define __FTS_SERVER_H__
+#ifndef __DATABASE_H__
+#define __DATABASE_H__
 
 #include <string>
 #include <chrono>
 #include <memory>
-#include <map>
-#include <mutex>
-#include <rtos/object_store.h>
-
-#include "index.h"
-#include "metadata.h"
 
 class E_TIMESERIES_DNE {};
 class E_ORDER {};
 
-class Server {
+class Database {
 
 public:
   // IMPORTANT
   // All of the following transactions occur with respect to the set
-  // of lists stored on the Server as indicated by server_connection
-
-  /* Create a client connected to the server accepting connections
-   * smpl::Remote_Address server .
-   */
-  Server(std::shared_ptr<Object_Store> backend, const std::string &prefix);
+  // of lists stored in a particular Database
 
   /* Append data to the list indicated by key at some time (in milliseconds)
   * between the time this function is called and the time it returns.
@@ -32,7 +21,7 @@ public:
   * key: Any std::string such that key.empty() = false
   * data: Any string
   */
-  bool append(const std::string &key, const std::string &data);
+  virtual bool append(const std::string &key, const std::string &data);
 
   /* Append data to the list indicated by key at time
   *
@@ -40,8 +29,8 @@ public:
   * time: Milliseconds since epoch > any previous time
   * data: Any string
   */
-  bool append(const std::string &key, const std::chrono::milliseconds &time,
-              const std::string &data);
+  virtual bool append(const std::string &key, const std::chrono::milliseconds &time,
+              const std::string &data) = 0;
 
   /* Append entire archive to the list indicated by key
   *
@@ -60,7 +49,7 @@ public:
   * key: Any std::string such that key.empty() = false
   * num_entries: >= 0
   */
-  std::string lastn(const std::string &key, const unsigned long long &num_entries);
+  virtual std::string lastn(const std::string &key, const unsigned long long &num_entries);
 
   /* Returns a vector contains all the entries in the list for key in
   * chronological order.  If the list is empty or no list exists, a vector
@@ -68,7 +57,7 @@ public:
   *
   * key: Any std::string such that key.empty() = false
   */
-  std::string all(const std::string &key);
+  virtual std::string all(const std::string &key);
 
   /* Returns a vector of all the values in the list for key between time
   * index start and end, inclusive. start and end must be in milliseconds since
@@ -78,38 +67,19 @@ public:
   * start: 0 <= end
   * end: 0 >= start
   */
-  std::string intervalt(const std::string &key, const std::chrono::milliseconds &start,
+  virtual std::string intervalt(const std::string &key, const std::chrono::milliseconds &start,
             const std::chrono::milliseconds &end);
 
-  std::string query(const std::string &key,
+  virtual std::string query(const std::string &key,
             const std::chrono::milliseconds &youngest, const std::chrono::milliseconds &oldest,
             const size_t &min_index, const size_t &max_index,
-            const size_t &tail_size, const std::chrono::milliseconds &tail_age);
+            const size_t &tail_size, const std::chrono::milliseconds &tail_age) = 0;
 
-  /* Returns the Index associated with a key
-   */
-  Index index(const std::string &key);
 
-  /* Returns a human readable string detailing the Server's current metadata
+  /* Returns a human readable string detailing the Database's current metadata
    * and internal state
    */
-  std::string str() const;
-
-private:
-  std::shared_ptr<Object_Store> _backend;
-  std::string _prefix;
-
-  size_t _index_resolution = 10;
-
-  std::map<std::string, std::shared_ptr<Metadata>> _metadata;
-  mutable std::mutex _metadata_lock;
-
-  std::shared_ptr<Metadata> _unsafe_get_metadata(const std::string &key);
-  std::shared_ptr<Metadata> _get_metadata(const std::string &key);
-  std::shared_ptr<Metadata> _get_or_create_metadata(const std::string &key);
-
-  Ref _ts_ref(const std::string &key) const;
-  Ref _index_ref(const std::string &key) const;
+  virtual std::string str() const;
 
 };
 

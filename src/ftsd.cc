@@ -8,7 +8,7 @@
 #include <smpl.h>
 #include <smplsocket.h>
 
-#include "server.h"
+#include "local_database.h"
 #include "archive.h"
 
 namespace po = boost::program_options;
@@ -16,7 +16,7 @@ namespace po = boost::program_options;
 std::string DIRECTORY = "./fts.db";
 std::string PREFIX;
 std::string UNIX_DOMAIN_SOCKET = "./fts.sock";
-std::shared_ptr<Server> server;
+std::shared_ptr<Local_Database> server;
 
 void handle_channel(std::shared_ptr<smpl::Channel> client){
 
@@ -45,7 +45,7 @@ int main(int argc, char* argv[]){
 
     std::shared_ptr<Object_Store> backend(new FS_Store(DIRECTORY, 5, 1));
 
-    server = std::shared_ptr<Server>(new Server(backend, PREFIX));
+    server = std::shared_ptr<Local_Database>(new Local_Database(backend, PREFIX));
 
     std::shared_ptr<smpl::Local_Address> unix_domain_socket(new smpl::Local_UDS(UNIX_DOMAIN_SOCKET));
     auto unix_domain_handler = std::thread(std::bind(handle_local_address, unix_domain_socket));
