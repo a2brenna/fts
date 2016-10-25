@@ -10,7 +10,7 @@ message Request {
 
 message Append {
     bytes data = 1;
-    uint64 millis_since_epoch = 2;
+    uint64 millitime = 2;
 }
 
 message Query {
