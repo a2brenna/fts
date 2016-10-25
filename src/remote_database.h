@@ -28,6 +28,7 @@ public:
 
 private:
   std::shared_ptr<smpl::Remote_Address> _server_address;
+  std::shared_ptr<smpl::Channel> _server;
 };
 
 #endif

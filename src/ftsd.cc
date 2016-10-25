@@ -9,6 +9,7 @@
 #include <smplsocket.h>
 
 #include "local_database.h"
+#include "wire_protocol.pb.h"
 #include "archive.h"
 
 namespace po = boost::program_options;
@@ -19,7 +20,58 @@ std::string UNIX_DOMAIN_SOCKET = "./fts.sock";
 std::shared_ptr<Local_Database> server;
 
 void handle_channel(std::shared_ptr<smpl::Channel> client){
+    for(;;){
+        try{
+            const std::string serialized_request = client->recv();
+            sls2::Request request;
+            request.ParseFromString(serialized_request);
 
+            sls2::Response response;
+            std::string query_result;
+
+            if(request.has_append()){
+                const bool append_success = server->append(request.key(),
+                    std::chrono::milliseconds(request.append().millitime()),
+                    request.append().data());
+
+                if(append_success){
+                    response.set_result(sls2::Response::SUCCESS);
+                }
+                else{
+                    response.set_result(sls2::Response::FAIL);
+                }
+            }
+            else if(request.has_query()){
+                query_result = server->query(request.key(),
+                    std::chrono::milliseconds(request.query().youngest()),
+                    std::chrono::milliseconds(request.query().oldest()),
+                    (size_t)request.query().min_index(),
+                    (size_t)request.query().max_index(),
+                    (size_t)request.query().tail_size(),
+                    std::chrono::milliseconds(request.query().tail_age()));
+
+                if(query_result.size() > 0){
+                    response.set_result(sls2::Response::BYTES_TO_FOLLOW);
+                }
+
+            }
+            else{
+                //unhandled message type
+                break;
+            }
+
+            std::string serialized_response;
+            response.SerializeToString(&serialized_response);
+            client->send(serialized_response);
+            if(response.result() == sls2::Response::BYTES_TO_FOLLOW){
+                assert(query_result.size() > 0);
+                client->send(query_result);
+            }
+        }
+        catch(smpl::Transport_Failed t){
+            break;
+        }
+    }
 }
 
 void handle_local_address(std::shared_ptr<smpl::Local_Address> incoming){
