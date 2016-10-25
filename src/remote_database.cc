@@ -7,6 +7,19 @@ Remote_Database::Remote_Database(std::shared_ptr<smpl::Remote_Address> server_ad
     _server = std::shared_ptr<smpl::Channel>(_server_address->connect());
 }
 
+sls2::Response Remote_Database::_perform(const sls2::Request &request){
+    std::string serialized_request;
+    request.SerializeToString(&serialized_request);
+
+    _server->send(serialized_request);
+
+    const std::string serialized_response = _server->recv();
+
+    sls2::Response response;
+    response.ParseFromString(serialized_response);
+    return response;
+}
+
 bool Remote_Database::append(const std::string &key, const std::chrono::milliseconds &time,
             const std::string &data){
 
@@ -17,16 +30,7 @@ bool Remote_Database::append(const std::string &key, const std::chrono::millisec
     append->set_data(data);
     append->set_millitime(time.count());
 
-    std::string serialized_request;
-    request.SerializeToString(&serialized_request);
-
-    _server->send(serialized_request);
-
-    const std::string serialized_response = _server->recv();
-
-    sls2::Response response;
-    response.ParseFromString(serialized_response);
-
+    const sls2::Response response = _perform(request);
     return(response.result() == sls2::Response::SUCCESS);
 }
 
@@ -46,15 +50,7 @@ std::string Remote_Database::query(const std::string &key,
     query->set_tail_size(tail_size);
     query->set_tail_age(tail_age.count());
 
-    std::string serialized_request;
-    request.SerializeToString(&serialized_request);
-
-    _server->send(serialized_request);
-
-    const std::string serialized_response = _server->recv();
-
-    sls2::Response response;
-    response.ParseFromString(serialized_response);
+    sls2::Response response = _perform(request);
 
     if(response.result() == sls2::Response::BYTES_TO_FOLLOW){
         const std::string query_result = _server->recv();

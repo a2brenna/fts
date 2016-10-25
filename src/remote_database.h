@@ -3,6 +3,7 @@
 
 #include <smpl.h>
 #include "database.h"
+#include "wire_protocol.pb.h"
 
 class Remote_Database : public Database {
 
@@ -29,6 +30,7 @@ public:
 private:
   std::shared_ptr<smpl::Remote_Address> _server_address;
   std::shared_ptr<smpl::Channel> _server;
+  sls2::Response _perform(const sls2::Request &request);
 };
 
 #endif
