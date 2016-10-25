@@ -9,10 +9,10 @@ CXXFLAGS=-L${LIBRARY_DIR} -I${INCLUDE_DIR} -O2 -g -std=c++14 -fPIC -Wall -Wextra
 all: ftsd fts
 
 fts: src/fts.cc metadata.o archive.o index.o wire_protocol.o database.o remote_database.o
-	${CXX} ${CXXFLAGS} -o fts src/fts.cc metadata.o archive.o index.o wire_protocol.o database.o remote_database.o -lboost_program_options -lrtosfs -lsodium -lcapnp -lkj -lsmplsocket
+	${CXX} ${CXXFLAGS} -o fts src/fts.cc metadata.o archive.o index.o wire_protocol.o database.o remote_database.o -lboost_program_options -lrtosfs -lsodium -lsmplsocket -lprotobuf
 
-ftsd: src/ftsd.cc database.o local_database.o metadata.o archive.o index.o wire_protocol.o internal.o metadata_cache.o manifest.o
-	${CXX} ${CXXFLAGS} -o ftsd src/ftsd.cc database.o local_database.o metadata.o archive.o index.o wire_protocol.o internal.o metadata_cache.o manifest.o -lboost_program_options -lrtosfs -lsodium -lcapnp -lkj -lsmplsocket -lpthread
+ftsd: src/ftsd.cc database.o local_database.o metadata.o archive.o index.o wire_protocol.o metadata_cache.o manifest.o
+	${CXX} ${CXXFLAGS} -o ftsd src/ftsd.cc database.o local_database.o metadata.o archive.o index.o wire_protocol.o metadata_cache.o manifest.o -lboost_program_options -lrtosfs -lsodium -lsmplsocket -lpthread -lprotobuf
 
 database.o: src/database.cc src/database.h
 	    ${CXX} ${CXXFLAGS} -c src/database.cc -o database.o
@@ -38,22 +38,16 @@ archive.o: src/archive.cc src/archive.h
 index.o: src/index.cc src/index.h
 	    ${CXX} ${CXXFLAGS} -c src/index.cc -o index.o
 
-src/wire_protocol.capnp.c++: src/wire_protocol.capnp
-	    capnp compile -oc++ src/wire_protocol.capnp
+wire_protocol.o: src/wire_protocol.pb.h
+	    ${CXX} ${CXXFLAGS} -c src/wire_protocol.pb.cc -o wire_protocol.o
 
-wire_protocol.o: src/wire_protocol.capnp.c++
-	    ${CXX} ${CXXFLAGS} -c src/wire_protocol.capnp.c++ -o wire_protocol.o
-
-src/internal.capnp.c++: src/internal.capnp
-	    capnp compile -oc++ src/internal.capnp
-
-internal.o: src/internal.capnp.c++
-	    ${CXX} ${CXXFLAGS} -c src/internal.capnp.c++ -o internal.o
+src/wire_protocol.pb.h: wire_protocol.proto
+		protoc --cpp_out=src/ wire_protocol.proto
 
 clean:
 	rm -f ftsd
 	rm -f *.o
 	rm -f *.so
 	rm -f *.a
-	rm -f src/*.capnp.h
-	rm -f src/*.capnp.c++
+	rm -f src/*.pb.h
+	rm -f src/*.pb.cc

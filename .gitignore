@@ -3,5 +3,5 @@ fts
 fts.db
 *.o
 *.so
-*.capnp.c++
-*.capnp.h
+*.pb.cc
+*.pb.h

@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package sls2;
+
+message Request {
+    string key = 1;
+    Append append = 2;
+    Query query = 3;
+}
+
+message Append {
+    bytes data = 1;
+    uint64 millis_since_epoch = 2;
+}
+
+message Query {
+    uint64 youngest = 1;
+    uint64 oldest = 2;
+    uint64 min_index = 3;
+    uint64 max_index = 4;
+    uint64 tail_size = 5;
+    uint64 tail_age = 6;
+}
+
+message Response {
+    Return_Code result = 1;
+    enum Return_Code {
+        SUCCESS = 0;
+        BYTES_TO_FOLLOW = 1;
+        FAIL = 2;
+    }
+}
