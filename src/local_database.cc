@@ -118,8 +118,8 @@ std::string Local_Database::query(const std::string &key,
     const size_t bounded_max_index = std::min(max_index, last_index);
     assert(bounded_min_index <= bounded_max_index);
 
-    const std::chrono::high_resolution_clock::time_point bounded_min_timestamp(std::max(oldest, now - tail_age));
-    const std::chrono::high_resolution_clock::time_point bounded_max_timestamp(std::min(youngest, now));
+    const std::chrono::high_resolution_clock::time_point bounded_min_timestamp(std::max(youngest, now - tail_age));
+    const std::chrono::high_resolution_clock::time_point bounded_max_timestamp(std::min(oldest, now));
     assert(bounded_min_timestamp <= bounded_max_timestamp);
 
     std::string output;
