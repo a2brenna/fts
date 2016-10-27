@@ -42,18 +42,22 @@ void handle_channel(std::shared_ptr<smpl::Channel> client){
                 }
             }
             else if(request.has_query()){
-                query_result = server->query(request.key(),
-                    std::chrono::milliseconds(request.query().youngest()),
-                    std::chrono::milliseconds(request.query().oldest()),
-                    (size_t)request.query().min_index(),
-                    (size_t)request.query().max_index(),
-                    (size_t)request.query().tail_size(),
-                    std::chrono::milliseconds(request.query().tail_age()));
+                try{
+                    query_result = server->query(request.key(),
+                        std::chrono::milliseconds(request.query().youngest()),
+                        std::chrono::milliseconds(request.query().oldest()),
+                        (size_t)request.query().min_index(),
+                        (size_t)request.query().max_index(),
+                        (size_t)request.query().tail_size(),
+                        std::chrono::milliseconds(request.query().tail_age()));
 
-                if(query_result.size() > 0){
-                    response.set_result(sls2::Response::BYTES_TO_FOLLOW);
+                    if(query_result.size() > 0){
+                        response.set_result(sls2::Response::BYTES_TO_FOLLOW);
+                    }
                 }
-
+                catch(E_TIMESERIES_DNE e){
+                    response.set_result(sls2::Response::FAIL);
+                }
             }
             else{
                 //unhandled message type
