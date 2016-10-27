@@ -14,33 +14,31 @@ std::string UNIX_DOMAIN_SOCKET;
 
 int main(int argc, char* argv[]){
     std::string timeseries;
+
     bool append = false;
-    bool query_time = false;
-    bool query_index = false;
-    bool all = false;
     std::string data;
-    uint64_t start_time = std::numeric_limits<uint64_t>::min();
-    uint64_t end_time = std::numeric_limits<uint64_t>::max();
-    uint64_t timestamp = std::numeric_limits<uint64_t>::min();
-    size_t start_index = 0;
-    size_t end_index = std::numeric_limits<size_t>::max();
-    size_t tail = 0;
+
+    uint64_t timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count();
+    uint64_t youngest = std::numeric_limits<uint64_t>::min();
+    uint64_t oldest = std::numeric_limits<uint64_t>::max();
+    size_t min_index = 0;
+    size_t max_index = std::numeric_limits<size_t>::max();
+    size_t tail_size = 0;
+    uint64_t tail_age = std::numeric_limits<uint64_t>::max();
 
 	po::options_description desc("Options");
 	desc.add_options()
         ("uds", po::value<std::string>(&UNIX_DOMAIN_SOCKET), "Server Unix Domain Socket")
         ("timeseries", po::value<std::string>(&timeseries), "Timeseries to operate on/query")
         ("append", po::bool_switch(&append), "Append data to timeseries")
-        ("query_time", po::bool_switch(&query_time), "Query timeseries by time window")
-        ("query_index", po::bool_switch(&query_index), "Query timeseries by index window")
-        ("all", po::bool_switch(&all), "Fetch entire timeseries")
         ("data", po::value<std::string>(&data), "Object to append")
         ("timestamp", po::value<uint64_t>(&timestamp), "Timestamp to append data at")
-        ("start_time", po::value<uint64_t>(&start_time), "Start time of query window")
-        ("end_time", po::value<uint64_t>(&end_time), "End time of query window")
-        ("start_index", po::value<size_t>(&start_index), "Start index of query window")
-        ("end_index", po::value<size_t>(&end_index), "End index of query window")
-        ("tail", po::value<size_t>(&tail), "Number of elements to fetch from end of timeseries")
+        ("youngest", po::value<uint64_t>(&youngest), "Start time of query window")
+        ("oldest", po::value<uint64_t>(&oldest), "End time of query window")
+        ("min_index", po::value<size_t>(&min_index), "Start index of query window")
+        ("max_index", po::value<size_t>(&max_index), "End index of query window")
+        ("tail_size", po::value<size_t>(&tail_size), "Number of elements to fetch from end of timeseries")
+        ("tail_age", po::value<uint64_t>(&tail_age), "Age of elements to fetch from end of timeseries")
     ;
 
 	po::variables_map vm;
@@ -48,53 +46,28 @@ int main(int argc, char* argv[]){
     po::notify(vm);
 
     assert(UNIX_DOMAIN_SOCKET.size() > 0);
+    if (timeseries.size() == 0){
+        std::cout << desc << std::endl;
+        return 0;
+    }
 
     std::shared_ptr<Database> server(new Remote_Database(std::shared_ptr<smpl::Remote_Address>(new smpl::Remote_UDS(UNIX_DOMAIN_SOCKET))));
 
     if(append && (data.size() != 0)){
-        if(timestamp == std::numeric_limits<uint64_t>::min()){
-            //No timestamp provided?
-            server->append(timeseries, data);
-        }
-        else{
-            server->append(timeseries, std::chrono::milliseconds(timestamp), data);
-        }
+        server->append(timeseries, std::chrono::milliseconds(timestamp), data);
         return 0;
     }
 
     std::string result;
 
-    if(query_time){
-        if(start_time < end_time){
-            result = server->intervalt(timeseries, std::chrono::milliseconds(start_time), std::chrono::milliseconds(end_time));
-        }
-        else{
-            std::cout << desc << std::endl;
-            return 1;
-        }
-    }
-    else if(query_index){
-        std::cout << "Index Queries currently unsupported" << std::endl;
-        return 1;
-        /*
-        if(start_index < end_index){
-
-        }
-        else{
-
-        }
-        */
-    }
-    else if(tail > 0){
-        result = server->lastn(timeseries, tail);
-    }
-    else if(all){
-        result = server->all(timeseries);
-    }
-    else{
-        std::cout << desc << std::endl;
-        return 1;
-    }
+    result = server->query(timeseries,
+            std::chrono::milliseconds(youngest),
+            std::chrono::milliseconds(oldest),
+            min_index,
+            max_index,
+            tail_size,
+            std::chrono::milliseconds(tail_age)
+            );
 
     std::cout << result << std::endl;
 
