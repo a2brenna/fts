@@ -105,7 +105,7 @@ std::string Local_Database::query(const std::string &key,
     const size_t &min_index, const size_t &max_index,
     const size_t &tail_size, const std::chrono::milliseconds &tail_age){
 
-    assert(youngest >= oldest);
+    assert(youngest <= oldest);
     assert(max_index >= min_index);
 
     std::shared_ptr<Metadata> metadata = _get_metadata(key);
@@ -116,11 +116,11 @@ std::string Local_Database::query(const std::string &key,
 
     const size_t bounded_min_index = std::max(min_index, last_index - tail_size);
     const size_t bounded_max_index = std::min(max_index, last_index);
-    assert(bounded_min_index >= bounded_max_index);
+    assert(bounded_min_index <= bounded_max_index);
 
     const std::chrono::high_resolution_clock::time_point bounded_min_timestamp(std::max(oldest, now - tail_age));
     const std::chrono::high_resolution_clock::time_point bounded_max_timestamp(std::min(youngest, now));
-    assert(bounded_min_timestamp >= bounded_max_timestamp);
+    assert(bounded_min_timestamp <= bounded_max_timestamp);
 
     std::string output;
 
