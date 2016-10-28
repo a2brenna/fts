@@ -75,3 +75,7 @@ one exist.
 Re-Index: Pending
     Ability to re-index a Timeseries on the fly and update the Manifest
 accordingly.
+
+Low Latency Asynchronous Append: Pending
+    Maybe listen on a udp socket for append requests that can be applied
+without bothering to respond to the client
