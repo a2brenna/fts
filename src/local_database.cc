@@ -138,7 +138,7 @@ std::string Local_Database::query(const std::string &key,
             i++;
         }
 
-        while( (a.current_time() <= bounded_max_timestamp) || (i <= bounded_max_index) ){
+        while( (a.current_time() <= bounded_max_timestamp) && (i <= bounded_max_index) ){
             output.append(a.current_record());
             a.next_record();
             i++;
