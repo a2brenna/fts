@@ -71,12 +71,12 @@ int main(int argc, char* argv[]){
     std::string result;
 
     result = server->query(timeseries,
-            std::chrono::milliseconds(youngest),
-            std::chrono::milliseconds(oldest),
+            youngest,
+            oldest,
             min_index,
             max_index,
             tail_size,
-            std::chrono::milliseconds(tail_age)
+            tail_age
             );
 
     std::cout << result << std::endl;
