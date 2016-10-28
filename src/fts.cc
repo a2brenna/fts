@@ -35,7 +35,7 @@ int main(int argc, char* argv[]){
 	desc.add_options()
         ("uds", po::value<std::string>(&UNIX_DOMAIN_SOCKET), "Server Unix Domain Socket")
         ("timeseries", po::value<std::string>(&timeseries), "Timeseries to operate on/query")
-        ("data", po::value<std::string>(&data), "Object to append")
+        ("append", po::value<std::string>(&data), "Object to append")
         ("timestamp", po::value<int64_t>(&arg_timestamp), "Timestamp to append data at")
         ("youngest", po::value<int64_t>(&arg_youngest), "Start time of query window")
         ("oldest", po::value<int64_t>(&arg_oldest), "End time of query window")
