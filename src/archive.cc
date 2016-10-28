@@ -26,7 +26,12 @@ size_t Archive::size() const{
 std::string Archive::current_data() const{
     const size_t data_size = *(uint64_t *)(&_archive[_cursor] + sizeof(uint64_t));
     if( (_cursor + data_size + sizeof(uint64_t) * 2) > _archive.size() ){
-        throw E_BAD_ARCHIVE();
+        if(_cursor == size()){
+            throw E_END_OF_ARCHIVE();
+        }
+        else{
+            throw E_BAD_ARCHIVE();
+        }
     }
     else{
         return std::string(_archive, _cursor + (sizeof(uint64_t) * 2), data_size);
@@ -41,7 +46,12 @@ std::string Archive::remainder() const{
 std::string Archive::current_record() const{
     const size_t record_size = *(uint64_t *)(&_archive[_cursor] + sizeof(uint64_t)) + (sizeof(uint64_t) * 2);
     if( (_cursor + record_size) > _archive.size() ){
-        throw E_BAD_ARCHIVE();
+        if(_cursor == size()){
+            throw E_END_OF_ARCHIVE();
+        }
+        else{
+            throw E_BAD_ARCHIVE();
+        }
     }
     else{
         return std::string(_archive, _cursor, record_size);
@@ -53,8 +63,11 @@ void Archive::next_record(){
     const size_t record_size = *(uint64_t *)(&_archive[_cursor] + sizeof(uint64_t));
     const size_t new_cursor = _cursor + sizeof(uint64_t) * 2 + record_size;
 
-    if(new_cursor >= _archive.size()){
+    if(new_cursor == _archive.size()){
         throw E_END_OF_ARCHIVE();
+    }
+    else if(new_cursor > _archive.size()){
+        throw E_BAD_ARCHIVE();
     }
     else{
         _current_index++;
