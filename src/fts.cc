@@ -85,7 +85,13 @@ int main(int argc, char* argv[]){
             tail_age
             );
 
-    std::cout << Archive(result).str() << std::endl;
+    try{
+        std::cout << Archive(result).str() << std::endl;
+    }
+    catch(E_BAD_ARCHIVE e){
+        std::cout << "BAD_ARCHIVE: " << std::endl;
+        std::cout << result << std::endl;
+    }
 
     return 0;
 }
