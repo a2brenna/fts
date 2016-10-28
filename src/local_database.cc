@@ -4,8 +4,6 @@
 #include "archive.h"
 #include "index.h"
 
-#include <iostream>
-
 const uint64_t MIN_INDEX = 0;
 const uint64_t MAX_INDEX = std::numeric_limits<uint64_t>::max();
 const uint64_t MAX_ENTRIES = std::numeric_limits<uint64_t>::max();
@@ -67,9 +65,6 @@ bool Local_Database::append(const std::string &key, const std::chrono::milliseco
     std::unique_lock<std::mutex> m(metadata->lock);
 
     if(time <= metadata->last_timestamp){
-        std::cout << "Current_Time: " << time.count() << std::endl;
-        std::cout << "Metadata: " << std::endl;
-        std::cout << metadata->str() << std::endl;
         throw E_ORDER();
     }
 
@@ -124,8 +119,6 @@ std::string Local_Database::query(const std::string &key,
 
     const std::chrono::milliseconds bounded_min_timestamp = std::max(youngest, now - tail_age);
     const std::chrono::milliseconds bounded_max_timestamp = std::min(oldest, now);
-    std::cerr << youngest.count() << " " << (now - tail_age).count() << " " << oldest.count() << " " << now.count() << std::endl;
-    std::cerr << bounded_min_timestamp.count() << " " << bounded_max_timestamp.count() << std::endl;
     assert(bounded_min_timestamp <= bounded_max_timestamp);
 
     std::string output;
