@@ -113,7 +113,7 @@ std::string Local_Database::query(const std::string &key,
     const uint64_t last_index = metadata->num_elements - 1;
     const auto now = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now().time_since_epoch());
 
-    const uint64_t bounded_min_index = std::max(min_index, last_index - tail_size);
+    const uint64_t bounded_min_index = std::max(min_index, last_index - (tail_size - 1));
     const uint64_t bounded_max_index = std::min(max_index, last_index);
     assert(bounded_min_index <= bounded_max_index);
 
