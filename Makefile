@@ -17,7 +17,7 @@ ftsd: src/ftsd.cc database.o local_database.o metadata.o archive.o index.o wire_
 database.o: src/database.cc src/database.h
 	    ${CXX} ${CXXFLAGS} -c src/database.cc -o database.o
 
-remote_database.o: src/remote_database.cc src/remote_database.h
+remote_database.o: src/remote_database.cc src/remote_database.h src/wire_protocol.pb.h
 	    ${CXX} ${CXXFLAGS} -c src/remote_database.cc -o remote_database.o
 
 local_database.o: src/local_database.cc src/local_database.h
