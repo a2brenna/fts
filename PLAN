@@ -2,7 +2,7 @@ Index: Implemented, needs testing
     Index each timeseries every k elements by appending a record of <timestamp,
 element_number, offset>.
 
-Intersection Query Specifications: Pending
+Intersection Query Specifications: Implemented, needs testing
     Allow queries to specify subsets and find the intersection.
 
 Accelerated Queries: Pending
@@ -11,7 +11,7 @@ chunk of the Archive to be retrieved/searched for the data in question.  Index
 records are fixed width (24 bytes) so we can binary search an Index quickly
 (since we can't binary search variable width Time_Series).
 
-Seperate Database Interface Specification: Pending
+Seperate Database Interface Specification: Implemented
     Seperate specificaton of database API from implementation to allow multiple
 remote/local implementations.
 
@@ -20,9 +20,11 @@ Seperate Server/Client namespace: Implemented
 clients from accidentally/deliberately messing with objects used for internal
 server bookkeeping.
 
-Commandline tools: Pending
-    Command line tool for appending streams of data, bulk import/export and
-queries.
+Commandline tools: Implemented, needs testing
+    Command line tool for appending streams of data and performing queries
+
+Import/export tools: Pending
+    Command line tools for bulk import/export.
 
 Metadata Caching: Pending
     Create way to cache and save metadata on gracefull shutdown and then load it
@@ -60,8 +62,8 @@ Variable Width, Fixed Interval, Variable Interval) and anything else that might
 be handy.  Store this header in the Manifest Object? At the beginning of each
 Time_Series Object?
 
-Wire Protocol: Pending
-    A Capn'Proto based wire protocol to allow a remote FTS Server to be used in
+Wire Protocol: Implemented
+    A Protobuff based wire protocol to allow a remote FTS Server to be used in
 place of an embedded one.  Local and Remote are two implementations of the same
 database specification.
 
