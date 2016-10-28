@@ -46,14 +46,14 @@ int main(int argc, char* argv[]){
         ("tail_age", po::value<int64_t>(&arg_tail_age), "Age of elements to fetch from end of timeseries")
     ;
 
+	po::variables_map vm;
+	po::store(po::parse_command_line(argc, argv, desc), vm);
+    po::notify(vm);
+
     timestamp = std::chrono::milliseconds(arg_timestamp);
     youngest = std::chrono::milliseconds(arg_youngest);
     oldest = std::chrono::milliseconds(arg_oldest);
     tail_age = std::chrono::milliseconds(arg_tail_age);
-
-	po::variables_map vm;
-	po::store(po::parse_command_line(argc, argv, desc), vm);
-    po::notify(vm);
 
     assert(UNIX_DOMAIN_SOCKET.size() > 0);
     if (timeseries.size() == 0){
