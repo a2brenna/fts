@@ -46,6 +46,7 @@ src/wire_protocol.pb.h: wire_protocol.proto
 
 clean:
 	rm -f ftsd
+	rm -f fts
 	rm -f *.o
 	rm -f *.so
 	rm -f *.a
