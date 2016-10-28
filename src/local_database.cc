@@ -4,9 +4,11 @@
 #include "archive.h"
 #include "index.h"
 
-const size_t MIN_INDEX = 0;
-const size_t MAX_INDEX = std::numeric_limits<size_t>::max();
-const size_t MAX_ENTRIES = std::numeric_limits<size_t>::max();
+#include <iostream>
+
+const uint64_t MIN_INDEX = 0;
+const uint64_t MAX_INDEX = std::numeric_limits<uint64_t>::max();
+const uint64_t MAX_ENTRIES = std::numeric_limits<uint64_t>::max();
 const auto MIN_TIMESTAMP = std::chrono::milliseconds::min();
 const auto MAX_TIMESTAMP = std::chrono::milliseconds::max();
 
@@ -64,8 +66,10 @@ bool Local_Database::append(const std::string &key, const std::chrono::milliseco
     std::shared_ptr<Metadata> metadata = _get_or_create_metadata(key);
     std::unique_lock<std::mutex> m(metadata->lock);
 
-    const std::chrono::high_resolution_clock::time_point t(time);
-    if(t <= metadata->last_timestamp){
+    if(time <= metadata->last_timestamp){
+        std::cout << "Current_Time: " << time.count() << std::endl;
+        std::cout << "Metadata: " << std::endl;
+        std::cout << metadata->str() << std::endl;
         throw E_ORDER();
     }
 
@@ -77,7 +81,7 @@ bool Local_Database::append(const std::string &key, const std::chrono::milliseco
     Index_Record i;
     i.offset = metadata->size;
     i.index = metadata->num_elements + 1;
-    i.timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(t.time_since_epoch()).count();
+    i.timestamp = time.count();
 
     const uint64_t data_size = data.size();
     const uint64_t data_timestamp = time.count();
@@ -89,7 +93,7 @@ bool Local_Database::append(const std::string &key, const std::chrono::milliseco
 
     _backend->append(_ts_ref(key), backend_string);
 
-    metadata->last_timestamp = t;
+    metadata->last_timestamp = time;
     metadata->size += backend_string.size();
     metadata->num_elements++;
 
@@ -102,8 +106,8 @@ bool Local_Database::append(const std::string &key, const std::chrono::milliseco
 
 std::string Local_Database::query(const std::string &key,
     const std::chrono::milliseconds &youngest, const std::chrono::milliseconds &oldest,
-    const size_t &min_index, const size_t &max_index,
-    const size_t &tail_size, const std::chrono::milliseconds &tail_age){
+    const uint64_t &min_index, const uint64_t &max_index,
+    const uint64_t &tail_size, const std::chrono::milliseconds &tail_age){
 
     assert(youngest <= oldest);
     assert(max_index >= min_index);
@@ -111,15 +115,17 @@ std::string Local_Database::query(const std::string &key,
     std::shared_ptr<Metadata> metadata = _get_metadata(key);
     std::unique_lock<std::mutex> m(metadata->lock);
 
-    const size_t last_index = metadata->num_elements - 1;
+    const uint64_t last_index = metadata->num_elements - 1;
     const auto now = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now().time_since_epoch());
 
-    const size_t bounded_min_index = std::max(min_index, last_index - tail_size);
-    const size_t bounded_max_index = std::min(max_index, last_index);
+    const uint64_t bounded_min_index = std::max(min_index, last_index - tail_size);
+    const uint64_t bounded_max_index = std::min(max_index, last_index);
     assert(bounded_min_index <= bounded_max_index);
 
-    const std::chrono::high_resolution_clock::time_point bounded_min_timestamp(std::max(youngest, now - tail_age));
-    const std::chrono::high_resolution_clock::time_point bounded_max_timestamp(std::min(oldest, now));
+    const std::chrono::milliseconds bounded_min_timestamp = std::max(youngest, now - tail_age);
+    const std::chrono::milliseconds bounded_max_timestamp = std::min(oldest, now);
+    std::cerr << youngest.count() << " " << (now - tail_age).count() << " " << oldest.count() << " " << now.count() << std::endl;
+    std::cerr << bounded_min_timestamp.count() << " " << bounded_max_timestamp.count() << std::endl;
     assert(bounded_min_timestamp <= bounded_max_timestamp);
 
     std::string output;
@@ -127,7 +133,7 @@ std::string Local_Database::query(const std::string &key,
     Archive a(_backend->fetch(_ts_ref(key)).data());
 
     try{
-        size_t i = 0;
+        uint64_t i = 0;
         while( (a.current_time() < bounded_min_timestamp) || (i < bounded_min_index) ){
             a.next_record();
             i++;

@@ -2,12 +2,15 @@
 #include "wire_protocol.pb.h"
 #include <cassert>
 
+#include <iostream>
+
 Remote_Database::Remote_Database(std::shared_ptr<smpl::Remote_Address> server_address){
     _server_address = server_address;
     _server = std::shared_ptr<smpl::Channel>(_server_address->connect());
 }
 
 sls2::Response Remote_Database::_perform(const sls2::Request &request){
+    std::cerr << "Request: " << request.DebugString() << std::endl;
     std::string serialized_request;
     request.SerializeToString(&serialized_request);
 

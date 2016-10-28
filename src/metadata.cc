@@ -1,5 +1,6 @@
 #include "metadata.h"
 #include "archive.h"
+#include <sstream>
 
 Metadata::Metadata(){
 
@@ -21,4 +22,12 @@ Metadata::Metadata(const Ref &data_ref, std::shared_ptr<Object_Store> backend, c
     last_timestamp = partial.current_time();
     num_elements = index + partial.current_index() + 1;
     size = offset + partial.size();
+}
+
+std::string Metadata::str() const{
+    std::stringstream out;
+    out << "num_elements: " << num_elements << " ";
+    out << "size: " << size << " ";
+    out << "last_timestamp: " << last_timestamp.count();
+    return out.str();
 }

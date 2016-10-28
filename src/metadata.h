@@ -13,7 +13,8 @@ class Metadata {
         mutable std::mutex lock;
         size_t num_elements = 0;
         size_t size = 0;
-        std::chrono::high_resolution_clock::time_point last_timestamp;
+        std::chrono::milliseconds last_timestamp;
+        std::string str() const;
 
         Metadata();
         Metadata(const Ref &data_ref, std::shared_ptr<Object_Store> backend, const size_t &index, const size_t &offset);

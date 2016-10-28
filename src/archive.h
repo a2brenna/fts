@@ -12,7 +12,7 @@ class Archive {
     public:
         Archive(const std::string &raw);
         Archive();
-        std::chrono::high_resolution_clock::time_point current_time() const;
+        std::chrono::milliseconds current_time() const;
         size_t current_index() const;
         size_t size() const;
         std::string current_data() const;

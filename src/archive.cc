@@ -9,9 +9,9 @@ Archive::Archive(){
 
 }
 
-std::chrono::high_resolution_clock::time_point Archive::current_time() const{
+std::chrono::milliseconds Archive::current_time() const{
     std::chrono::milliseconds since_epoch(*(uint64_t *)(&_archive[_cursor]));
-    return std::chrono::high_resolution_clock::time_point(since_epoch);
+    return since_epoch;
 }
 
 size_t Archive::current_index() const{

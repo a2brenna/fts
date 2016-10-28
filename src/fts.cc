@@ -18,13 +18,18 @@ int main(int argc, char* argv[]){
     bool append = false;
     std::string data;
 
-    uint64_t timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count();
-    uint64_t youngest = std::numeric_limits<uint64_t>::min();
-    uint64_t oldest = std::numeric_limits<uint64_t>::max();
-    size_t min_index = 0;
-    size_t max_index = std::numeric_limits<size_t>::max();
-    size_t tail_size = 0;
-    uint64_t tail_age = std::numeric_limits<uint64_t>::max();
+    std::chrono::milliseconds timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now().time_since_epoch());
+    std::chrono::milliseconds youngest = std::chrono::milliseconds::min();
+    std::chrono::milliseconds oldest = std::chrono::milliseconds::max();
+    uint64_t min_index = 0;
+    uint64_t max_index = std::numeric_limits<size_t>::max();
+    uint64_t tail_size = 0;
+    std::chrono::milliseconds tail_age = std::chrono::milliseconds::max();
+
+    int64_t arg_timestamp = timestamp.count();
+    int64_t arg_youngest = youngest.count();
+    int64_t arg_oldest = oldest.count();
+    int64_t arg_tail_age = tail_age.count();
 
 	po::options_description desc("Options");
 	desc.add_options()
@@ -32,14 +37,19 @@ int main(int argc, char* argv[]){
         ("timeseries", po::value<std::string>(&timeseries), "Timeseries to operate on/query")
         ("append", po::bool_switch(&append), "Append data to timeseries")
         ("data", po::value<std::string>(&data), "Object to append")
-        ("timestamp", po::value<uint64_t>(&timestamp), "Timestamp to append data at")
-        ("youngest", po::value<uint64_t>(&youngest), "Start time of query window")
-        ("oldest", po::value<uint64_t>(&oldest), "End time of query window")
-        ("min_index", po::value<size_t>(&min_index), "Start index of query window")
-        ("max_index", po::value<size_t>(&max_index), "End index of query window")
-        ("tail_size", po::value<size_t>(&tail_size), "Number of elements to fetch from end of timeseries")
-        ("tail_age", po::value<uint64_t>(&tail_age), "Age of elements to fetch from end of timeseries")
+        ("timestamp", po::value<int64_t>(&arg_timestamp), "Timestamp to append data at")
+        ("youngest", po::value<int64_t>(&arg_youngest), "Start time of query window")
+        ("oldest", po::value<int64_t>(&arg_oldest), "End time of query window")
+        ("min_index", po::value<uint64_t>(&min_index), "Start index of query window")
+        ("max_index", po::value<uint64_t>(&max_index), "End index of query window")
+        ("tail_size", po::value<uint64_t>(&tail_size), "Number of elements to fetch from end of timeseries")
+        ("tail_age", po::value<int64_t>(&arg_tail_age), "Age of elements to fetch from end of timeseries")
     ;
+
+    timestamp = std::chrono::milliseconds(arg_timestamp);
+    youngest = std::chrono::milliseconds(arg_youngest);
+    oldest = std::chrono::milliseconds(arg_oldest);
+    tail_age = std::chrono::milliseconds(arg_tail_age);
 
 	po::variables_map vm;
 	po::store(po::parse_command_line(argc, argv, desc), vm);
