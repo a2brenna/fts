@@ -46,7 +46,14 @@ int main(int argc, char* argv[]){
     ;
 
 	po::variables_map vm;
-	po::store(po::parse_command_line(argc, argv, desc), vm);
+    try{
+        po::store(po::parse_command_line(argc, argv, desc), vm);
+    }
+    catch(...){
+        std::cout << "Error parsing arguments" << std::endl;
+        std::cout << desc << std::endl;
+        return -1;
+    }
     po::notify(vm);
 
     timestamp = std::chrono::milliseconds(arg_timestamp);
