@@ -16,7 +16,6 @@ std::string UNIX_DOMAIN_SOCKET;
 int main(int argc, char* argv[]){
     std::string timeseries;
 
-    bool append = false;
     std::string data;
 
     std::chrono::milliseconds timestamp = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now().time_since_epoch());
@@ -36,7 +35,6 @@ int main(int argc, char* argv[]){
 	desc.add_options()
         ("uds", po::value<std::string>(&UNIX_DOMAIN_SOCKET), "Server Unix Domain Socket")
         ("timeseries", po::value<std::string>(&timeseries), "Timeseries to operate on/query")
-        ("append", po::bool_switch(&append), "Append data to timeseries")
         ("data", po::value<std::string>(&data), "Object to append")
         ("timestamp", po::value<int64_t>(&arg_timestamp), "Timestamp to append data at")
         ("youngest", po::value<int64_t>(&arg_youngest), "Start time of query window")
@@ -64,7 +62,7 @@ int main(int argc, char* argv[]){
 
     std::shared_ptr<Database> server(new Remote_Database(std::shared_ptr<smpl::Remote_Address>(new smpl::Remote_UDS(UNIX_DOMAIN_SOCKET))));
 
-    if(append && (data.size() != 0)){
+    if(data.size() != 0){
         server->append(timeseries, std::chrono::milliseconds(timestamp), data);
         return 0;
     }
