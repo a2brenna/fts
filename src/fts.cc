@@ -7,6 +7,7 @@
 #include <smplsocket.h>
 
 #include "remote_database.h"
+#include "archive.h"
 
 namespace po = boost::program_options;
 
@@ -79,7 +80,7 @@ int main(int argc, char* argv[]){
             tail_age
             );
 
-    std::cout << result << std::endl;
+    std::cout << Archive(result).str() << std::endl;
 
     return 0;
 }

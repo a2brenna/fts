@@ -1,4 +1,5 @@
 #include "archive.h"
+#include <sstream>
 #include <cassert>
 
 Archive::Archive(const std::string &raw){
@@ -61,4 +62,22 @@ void Archive::next_record(){
         return;
     }
     assert(false);
+}
+
+std::string Archive::str(){
+    std::stringstream output;
+    for(;;){
+        try{
+            output << current_index() << " "
+                << current_time().count() << " "
+                << current_data()
+                << std::endl;
+            next_record();
+        }
+        catch(E_END_OF_ARCHIVE){
+            break;
+        }
+    }
+
+    return output.str();
 }
