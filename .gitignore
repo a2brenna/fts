@@ -1,5 +1,6 @@
 ftsd
 fts
+test
 fts.db
 *.o
 *.so

@@ -6,10 +6,13 @@ PREFIX=/usr
 CXX=g++
 CXXFLAGS=-L${LIBRARY_DIR} -I${INCLUDE_DIR} -O2 -g -std=c++14 -fPIC -Wall -Wextra -march=native
 
-all: ftsd fts
+all: ftsd fts test
 
 fts: src/fts.cc metadata.o archive.o index.o wire_protocol.o database.o remote_database.o
 	${CXX} ${CXXFLAGS} -o fts src/fts.cc metadata.o archive.o index.o wire_protocol.o database.o remote_database.o -lboost_program_options -lrtosfs -lsodium -lsmplsocket -lprotobuf
+
+test: src/test.cc metadata.o archive.o index.o wire_protocol.o database.o remote_database.o
+	${CXX} ${CXXFLAGS} -o test src/test.cc metadata.o archive.o index.o wire_protocol.o database.o remote_database.o -lboost_program_options -lrtosfs -lsodium -lsmplsocket -lprotobuf
 
 ftsd: src/ftsd.cc database.o local_database.o metadata.o archive.o index.o wire_protocol.o metadata_cache.o manifest.o
 	${CXX} ${CXXFLAGS} -o ftsd src/ftsd.cc database.o local_database.o metadata.o archive.o index.o wire_protocol.o metadata_cache.o manifest.o -lboost_program_options -lrtosfs -lsodium -lsmplsocket -lpthread -lprotobuf
@@ -47,6 +50,7 @@ src/wire_protocol.pb.h: wire_protocol.proto
 clean:
 	rm -f ftsd
 	rm -f fts
+	rm -f test
 	rm -f *.o
 	rm -f *.so
 	rm -f *.a
