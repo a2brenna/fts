@@ -15,7 +15,7 @@ test: src/test.cc metadata.o archive.o index.o wire_protocol.o database.o remote
 	${CXX} ${CXXFLAGS} -o test src/test.cc metadata.o archive.o index.o wire_protocol.o database.o remote_database.o -lboost_program_options -lrtosfs -lsodium -lsmplsocket -lprotobuf
 
 ftsd: src/ftsd.cc database.o local_database.o metadata.o archive.o index.o wire_protocol.o metadata_cache.o manifest.o
-	${CXX} ${CXXFLAGS} -o ftsd src/ftsd.cc database.o local_database.o metadata.o archive.o index.o wire_protocol.o metadata_cache.o manifest.o -lboost_program_options -lrtosfs -lsodium -lsmplsocket -lpthread -lprotobuf
+	${CXX} ${CXXFLAGS} -o ftsd src/ftsd.cc database.o local_database.o metadata.o archive.o index.o wire_protocol.o metadata_cache.o manifest.o -lboost_program_options -lsodium -lsmplsocket -lpthread -lprotobuf -lrrtos
 
 database.o: src/database.cc src/database.h
 	    ${CXX} ${CXXFLAGS} -c src/database.cc -o database.o
