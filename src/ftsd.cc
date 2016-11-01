@@ -26,7 +26,6 @@ void handle_channel(std::shared_ptr<smpl::Channel> client){
             const std::string serialized_request = client->recv();
             sls2::Request request;
             request.ParseFromString(serialized_request);
-            std::cout << request.DebugString() << std::endl;
 
             sls2::Response response;
             std::string query_result;
