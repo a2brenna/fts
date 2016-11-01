@@ -61,8 +61,7 @@ int main(int argc, char* argv[]){
     oldest = std::chrono::milliseconds(arg_oldest);
     tail_age = std::chrono::milliseconds(arg_tail_age);
 
-    assert(UNIX_DOMAIN_SOCKET.size() > 0);
-    if (timeseries.size() == 0){
+    if ( (timeseries.size() == 0) || (UNIX_DOMAIN_SOCKET.size() == 0) ){
         std::cout << desc << std::endl;
         return 0;
     }
