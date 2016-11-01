@@ -8,19 +8,19 @@ CXXFLAGS=-L${LIBRARY_DIR} -I${INCLUDE_DIR} -O2 -g -std=c++14 -fPIC -Wall -Wextra
 
 all: ftsd fts test
 
-fts: src/fts.cc metadata.o archive.o index.o wire_protocol.o database.o remote_database.o
-	${CXX} ${CXXFLAGS} -o fts src/fts.cc metadata.o archive.o index.o wire_protocol.o database.o remote_database.o -lboost_program_options -lrtosfs -lsodium -lsmplsocket -lprotobuf
+fts: src/fts.cc metadata.o archive.o index.o fts_wire_protocol.o database.o remote_database.o
+	${CXX} ${CXXFLAGS} -o fts src/fts.cc metadata.o archive.o index.o fts_wire_protocol.o database.o remote_database.o -lboost_program_options -lrtosfs -lsodium -lsmplsocket -lprotobuf
 
-test: src/test.cc metadata.o archive.o index.o wire_protocol.o database.o remote_database.o
-	${CXX} ${CXXFLAGS} -o test src/test.cc metadata.o archive.o index.o wire_protocol.o database.o remote_database.o -lboost_program_options -lrtosfs -lsodium -lsmplsocket -lprotobuf
+test: src/test.cc metadata.o archive.o index.o fts_wire_protocol.o database.o remote_database.o
+	${CXX} ${CXXFLAGS} -o test src/test.cc metadata.o archive.o index.o fts_wire_protocol.o database.o remote_database.o -lboost_program_options -lrtosfs -lsodium -lsmplsocket -lprotobuf
 
-ftsd: src/ftsd.cc database.o local_database.o metadata.o archive.o index.o wire_protocol.o metadata_cache.o manifest.o
-	${CXX} ${CXXFLAGS} -o ftsd src/ftsd.cc database.o local_database.o metadata.o archive.o index.o wire_protocol.o metadata_cache.o manifest.o -lboost_program_options -lsodium -lsmplsocket -lpthread -lprotobuf -lrrtos
+ftsd: src/ftsd.cc database.o local_database.o metadata.o archive.o index.o fts_wire_protocol.o metadata_cache.o manifest.o
+	${CXX} ${CXXFLAGS} -o ftsd src/ftsd.cc database.o local_database.o metadata.o archive.o index.o fts_wire_protocol.o metadata_cache.o manifest.o -lboost_program_options -lsodium -lsmplsocket -lpthread -lprotobuf -lrrtos
 
 database.o: src/database.cc src/database.h
 	    ${CXX} ${CXXFLAGS} -c src/database.cc -o database.o
 
-remote_database.o: src/remote_database.cc src/remote_database.h src/wire_protocol.pb.h
+remote_database.o: src/remote_database.cc src/remote_database.h src/fts_wire_protocol.pb.h
 	    ${CXX} ${CXXFLAGS} -c src/remote_database.cc -o remote_database.o
 
 local_database.o: src/local_database.cc src/local_database.h
@@ -41,11 +41,11 @@ archive.o: src/archive.cc src/archive.h
 index.o: src/index.cc src/index.h
 	    ${CXX} ${CXXFLAGS} -c src/index.cc -o index.o
 
-wire_protocol.o: src/wire_protocol.pb.h
-	    ${CXX} ${CXXFLAGS} -c src/wire_protocol.pb.cc -o wire_protocol.o
+fts_wire_protocol.o: src/fts_wire_protocol.pb.h
+	    ${CXX} ${CXXFLAGS} -c src/fts_wire_protocol.pb.cc -o fts_wire_protocol.o
 
-src/wire_protocol.pb.h: wire_protocol.proto
-		protoc --cpp_out=src/ wire_protocol.proto
+src/fts_wire_protocol.pb.h: fts_wire_protocol.proto
+		protoc --cpp_out=src/ fts_wire_protocol.proto
 
 clean:
 	rm -f ftsd

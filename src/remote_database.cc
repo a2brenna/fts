@@ -1,5 +1,5 @@
 #include "remote_database.h"
-#include "wire_protocol.pb.h"
+#include "fts_wire_protocol.pb.h"
 #include <cassert>
 
 #include <iostream>

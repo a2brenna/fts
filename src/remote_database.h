@@ -3,7 +3,7 @@
 
 #include <smpl.h>
 #include "database.h"
-#include "wire_protocol.pb.h"
+#include "fts_wire_protocol.pb.h"
 
 class Remote_Database : public Database {
 

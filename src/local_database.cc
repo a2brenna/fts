@@ -129,6 +129,10 @@ std::string Local_Database::query(const std::string &key,
 
     std::string output;
 
+    /*TODO: Perform index query to get some bounds on the object to fetch
+    Index index(_backend->fetch(_index_ref(key)).data());
+    */
+
     Archive a(_backend->fetch(_ts_ref(key)).data());
 
     try{

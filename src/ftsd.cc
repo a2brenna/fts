@@ -10,7 +10,7 @@
 #include <rtos/remote_store.h>
 
 #include "local_database.h"
-#include "wire_protocol.pb.h"
+#include "fts_wire_protocol.pb.h"
 #include "archive.h"
 
 namespace po = boost::program_options;
@@ -92,6 +92,7 @@ int main(int argc, char* argv[]){
 	po::options_description desc("Options");
 	desc.add_options()
         ("rtos-uds", po::value<std::string>(&RTOS_UDS), "Unix Domain Socket of RTOS backend")
+        ("uds", po::value<std::string>(&UNIX_DOMAIN_SOCKET), "Unix Domain Socket to listen on")
         ("prefix", po::value<std::string>(&PREFIX), "Unique database name")
     ;
 
