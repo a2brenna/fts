@@ -1,2 +1,3 @@
+Add proper config file reading and option parsing
 Query correctness tests
 Implement proper iterators for Archive
